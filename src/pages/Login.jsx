@@ -26,6 +26,7 @@ function Login() {
                 navigate('/home')
             }
             else {
+
                 alert(res.data.message)
             }
             console.log(res.data)
