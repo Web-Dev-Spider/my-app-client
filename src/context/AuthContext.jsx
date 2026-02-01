@@ -1,38 +1,62 @@
-import React from 'react'
-import { useContext, createContext, useState } from 'react'
+import React, { useContext, createContext, useState, useEffect } from "react"
 
+import api from "../axios/axiosInstance"
 
 const AuthContext = createContext({
     isAuthenticated: false,
+    user: null,
     login: () => { },
     logout: () => { },
-    role: null,
-    loading: false
+    loading: true
 })
 
-
 export const AuthProvider = ({ children }) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('token'))
-    const [role, setRole] = useState(() => localStorage.getItem('role'))
-    const [loading, setLoading] = useState(false)
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const [user, setUser] = useState(null)
+    const [loading, setLoading] = useState(true)
 
-    const login = (token, role) => {
-        localStorage.setItem('token', token)
-        localStorage.setItem('role', role)
+    // Check auth on page refresh
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const res = await api.get("/auth/me", {
+                    withCredentials: true
+                })
+
+                setIsAuthenticated(true)
+                setUser(res.data.user)
+            } catch (err) {
+                console.log(err)
+                setIsAuthenticated(false)
+                setUser(null)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        checkAuth()
+    }, [])
+
+    // Login function
+    const login = async (identifier, password) => {
+        const res = await api.post("/auth/login", { identifier, password }, {
+            withCredentials: true
+        })
+
         setIsAuthenticated(true)
-        setRole(role)
+        setUser(res.data.user)
     }
 
-    const logout = () => {
-        localStorage.removeItem('token')
-        localStorage.removeItem('role')
+    // Logout function
+    const logout = async () => {
+        await api.get("/auth/logout", {}, { withCredentials: true })
+
         setIsAuthenticated(false)
-        setRole(null)
-        setLoading(false)
+        setUser(null)
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, role, loading }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loading }}>
             {children}
         </AuthContext.Provider>
     )

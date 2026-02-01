@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../axios/axiosInstance";
+
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
     const navigate = useNavigate();
+    const { login } = useAuth()
 
     const [form, setForm] = useState({
         identifier: "",
@@ -14,6 +16,7 @@ function Login() {
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
+        console.log(e.target.name + " " + e.target.value)
         setForm((prev) => ({
             ...prev,
             [e.target.name]: e.target.value
@@ -22,18 +25,19 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
-        setLoading(true);
+
+        // setError("");
+        // setLoading(true);
+        console.log("Submitting login details", form.identifier, form.password)
 
         try {
-            const res = await api.post("/auth/login", {
-                identifier: form.identifier,
-                password: form.password
-            });
+            const data = await login(form.identifier, form.password);
 
-            const data = res.data;
+            console.log(data)
 
             if (data.success) {
+                login(data.user)
+                console.log(data.user)
                 // backend already set cookie
                 navigate(data.redirectTo || "/home");
             } else {
