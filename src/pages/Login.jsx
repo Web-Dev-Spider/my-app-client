@@ -1,59 +1,108 @@
-import axios from 'axios'
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../axios/axiosInstance";
 
 function Login() {
-    const navigate = useNavigate()
-    const [loginData, setLoginData] = useState({
-        email: '',
-        password: ''
-    })
+    const navigate = useNavigate();
+
+    const [form, setForm] = useState({
+        identifier: "",
+        password: ""
+    });
+
+    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
-        console.log(e.target.value)
-        setLoginData({
-            ...loginData,
+        setForm((prev) => ({
+            ...prev,
             [e.target.name]: e.target.value
-        })
-    }
-    const handleLogin = async (e) => {
-        e.preventDefault()
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError("");
+        setLoading(true);
 
         try {
-            const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`, loginData, { withCredentials: true })
-            if (res.data.success) {
+            const res = await api.post("/auth/login", {
+                identifier: form.identifier,
+                password: form.password
+            });
 
-                navigate('/home')
+            const data = res.data;
+
+            if (data.success) {
+                // backend already set cookie
+                navigate(data.redirectTo || "/home");
+            } else {
+                setError(data.message || "Login failed");
             }
-            else {
 
-                alert(res.data.message)
-            }
-            console.log(res.data)
+        } catch (err) {
+            const msg =
+                err.response?.data?.message ||
+                "Unable to login. Please try again.";
 
-        } catch (error) {
-            console.log(error)
+            setError(msg);
+        } finally {
+            setLoading(false);
         }
-        // console.log(loginData)
-    }
+    };
+
     return (
-        <div className='w-1/3 bg-amber-500 h-auto mx-auto mt-5 p-5'>
-            <form onSubmit={handleLogin} className='flex flex-col gap-2'>
+        <div className="w-full max-w-sm mx-auto mt-10 p-6 bg-amber-500 rounded">
+
+            <h2 className="text-xl font-semibold mb-4 text-center">
+                Login
+            </h2>
+
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+
                 <div>
-
-                    <label htmlFor="name">Email</label>
-                    <input type="text" className='bg-amber-200' name="email" value={loginData.email} onChange={handleChange} />
+                    <label className="block text-sm mb-1">
+                        Email / Username / Mobile
+                    </label>
+                    <input
+                        type="text"
+                        name="identifier"
+                        value={form.identifier}
+                        onChange={handleChange}
+                        className="w-full px-2 py-1 rounded bg-amber-200"
+                        autoComplete="username"
+                    />
                 </div>
+
                 <div>
-
-                    <label htmlFor="name">Password</label>
-                    <input type="password" className='bg-amber-200' name='password' value={loginData.password} onChange={handleChange} />
+                    <label className="block text-sm mb-1">
+                        Password
+                    </label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={form.password}
+                        onChange={handleChange}
+                        className="w-full px-2 py-1 rounded bg-amber-200"
+                        autoComplete="current-password"
+                    />
                 </div>
 
-                <button className='bg-amber-950 text-white w-1/2 mx-auto' type='submit'>Login</button>
+                {error && (
+                    <p className="text-red-700 text-sm">{error}</p>
+                )}
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-amber-950 text-white py-1 rounded mt-2 disabled:opacity-60"
+                >
+                    {loading ? "Logging in..." : "Login"}
+                </button>
+
             </form>
         </div>
-    )
+    );
 }
 
-export default Login
+export default Login;

@@ -30,7 +30,7 @@
 
 // export default App
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -39,6 +39,8 @@ import About from './pages/About'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Layout from './layouts/Layout'
+import PageNotFound from './pages/PageNotFound'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
 
@@ -51,9 +53,12 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/home" element={<Welcome />} />
         <Route path="/about" element={<About />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/*" element={<Navigate to="/" />} />
       </Route>
 
       {/* Routes WITHOUT Navbar */}

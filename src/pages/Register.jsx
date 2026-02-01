@@ -30,7 +30,9 @@ function Register() {
         console.log("Registration data", registrationData)
         setLoading(true)
         const res = await api.post(`/auth/register`, registrationData)
+        setLoading(false)
         if (res.data.success) {
+            console.log(res.data.newAgency)
 
             navigate('/dashboard')
         } else {
@@ -52,7 +54,7 @@ function Register() {
                         <option value="HPCL">HPCL</option>
                         <option value="BPCL">BPCL</option>
                     </select>
-                    <input className="w-full mb-3 p-2 border rounded" name='sapcode' placeholder="sapcode" onChange={handleChange} value={registrationData.sapCode} />
+                    <input className="w-full mb-3 p-2 border rounded" name='sapcode' placeholder="sapcode" onChange={handleChange} value={registrationData.sapcode} />
                     <input className="w-full mb-3 p-2 border rounded" name='email' placeholder="Email" onChange={handleChange} value={registrationData.email} />
                     <input className="w-full mb-3 p-2 border rounded" name='password' type="password" placeholder="Password" onChange={handleChange} value={registrationData.password} />
                     <button className="w-full bg-orange-600 text-white py-2 rounded" onClick={handleRegister}>Create Account</button>
