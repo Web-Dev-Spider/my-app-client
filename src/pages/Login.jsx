@@ -12,7 +12,7 @@ function Login() {
         password: ""
     });
 
-    const [error, setError] = useState("");
+    const [error, setError] = useState(" ");
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -26,20 +26,20 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // setError("");
-        // setLoading(true);
-        console.log("Submitting login details", form.identifier, form.password)
+        setError("");
+        setLoading(true);
+        // console.log("Submitting login details", form.identifier, form.password)
 
         try {
             const data = await login(form.identifier, form.password);
 
-            console.log(data)
+            // console.log("data after login", data)
 
             if (data.success) {
-                login(data.user)
-                console.log(data.user)
+
+                // console.log(data.user)
                 // backend already set cookie
-                navigate(data.redirectTo || "/home");
+                navigate(data.redirectTo || "/");
             } else {
                 setError(data.message || "Login failed");
             }

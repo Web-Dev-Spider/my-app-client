@@ -21,7 +21,7 @@ function Navbar() {
                 <div className="flex gap-3 items-center">
                     {isAuthenticated ? (
                         <>
-                            <span>role: {user?.role}</span>
+                            <span>Hello {user?.role}</span>
                             <button
                                 onClick={logout}
                                 className="px-4 py-2 border border-gray-800 text-gray-900 rounded-lg"

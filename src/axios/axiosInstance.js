@@ -3,6 +3,9 @@ import axios from "axios";
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_BASE_URL}`,
   withCredentials: true,
+  validateStatus: function (status) {
+    return status < 500; // <-- accept 401, 403, 404 as resolved
+  },
   headers: {
     "Content-Type": "application/json",
   },
