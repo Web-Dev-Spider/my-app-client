@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 
 function Welcome() {
     const { isAuthenticated, user, agency } = useAuth()
-    console.log("agency : ", agency)
+    // console.log("agency : ", agency)
     return (
         <div>
             <h3 className='text-4xl text-red-500'>Agency: {agency?.name}</h3>

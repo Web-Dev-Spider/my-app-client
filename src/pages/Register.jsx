@@ -27,12 +27,12 @@ function Register() {
 
     const handleRegister = async (e) => {
         e.preventDefault()
-        console.log("Registration data", registrationData)
+        // console.log("Registration data", registrationData)
         setLoading(true)
         const res = await api.post(`/auth/register`, registrationData)
         setLoading(false)
         if (res.data.success) {
-            console.log(res.data.newAgency)
+            // console.log(res.data.newAgency)
 
             navigate('/dashboard')
         } else {

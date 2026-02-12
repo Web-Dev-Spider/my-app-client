@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
                 const res = await api.get("/auth/me", {
                     withCredentials: true
                 })
-                console.log("res.data in checkAuth AuthContext", res.data)
+                // console.log("res.data in checkAuth AuthContext", res.data)
                 setIsAuthenticated(true)
                 setUser(res.data.user)
                 setAgency(res.data.agency)
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
             })
 
             if (res.status === 200) {
-                console.log("res.data in login AuthContext", res.data)
+                // console.log("res.data in login AuthContext", res.data)
                 localStorage.setItem("hasSession", "true")
                 setIsAuthenticated(true)
                 setUser(res.data.user)

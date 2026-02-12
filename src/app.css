@@ -1,0 +1,15 @@
+.app-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* .page-body {
+  display: flex;
+  overflow: hidden;
+} */
+.page-body {
+  flex: 1;
+  /* display: flex; */
+  overflow-y: auto; /* scroll only this area */
+}

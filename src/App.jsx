@@ -40,9 +40,10 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Layout from './layouts/Layout'
 import PageNotFound from './pages/PageNotFound'
+import KycPage from './pages/KycPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
-
+import './app.css'
 function App() {
 
   return (
@@ -56,6 +57,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/kyc" element={<KycPage />} />
           </Route>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
