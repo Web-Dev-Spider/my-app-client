@@ -1,22 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { useAuth } from "../context/AuthContext";
 
 function Login() {
     const navigate = useNavigate();
-    const { login } = useAuth()
+    const { login } = useAuth();
 
     const [form, setForm] = useState({
         identifier: "",
         password: ""
     });
 
-    const [error, setError] = useState(" ");
+    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
-        // console.log(e.target.name + " " + e.target.value)
         setForm((prev) => ({
             ...prev,
             [e.target.name]: e.target.value
@@ -28,17 +26,11 @@ function Login() {
 
         setError("");
         setLoading(true);
-        // console.log("Submitting login details", form.identifier, form.password)
 
         try {
             const data = await login(form.identifier, form.password);
 
-            // console.log("data after login", data)
-
             if (data.success) {
-
-                // console.log(data.user)
-                // backend already set cookie
                 navigate(data.redirectTo || "/");
             } else {
                 setError(data.message || "Login failed");
@@ -56,16 +48,18 @@ function Login() {
     };
 
     return (
-        <div className="w-full max-w-sm mx-auto mt-10 p-6 bg-amber-500 rounded">
+        <div className="w-full max-w-sm mx-auto mt-12 p-6
+                        bg-[#ebe9e7] rounded-xl
+                        border border-[#8a7b70] shadow">
 
-            <h2 className="text-xl font-semibold mb-4 text-center">
+            <h2 className="text-xl font-semibold mb-5 text-center text-[#312525]">
                 Login
             </h2>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
                 <div>
-                    <label className="block text-sm mb-1">
+                    <label className="block text-sm mb-1 text-[#594c41]">
                         Email / Username / Mobile
                     </label>
                     <input
@@ -73,13 +67,19 @@ function Login() {
                         name="identifier"
                         value={form.identifier}
                         onChange={handleChange}
-                        className="w-full px-2 py-1 rounded bg-amber-200"
+                        className="w-full px-3 py-2 rounded
+                                   bg-[#ddd8d5]
+                                   text-[#312525]
+                                   border border-[#8a7b70]
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-[#8a7b70]"
                         autoComplete="username"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm mb-1">
+                    <label className="block text-sm mb-1 text-[#594c41]">
                         Password
                     </label>
                     <input
@@ -87,19 +87,33 @@ function Login() {
                         name="password"
                         value={form.password}
                         onChange={handleChange}
-                        className="w-full px-2 py-1 rounded bg-amber-200"
+                        className="w-full px-3 py-2 rounded
+                                   bg-[#ddd8d5]
+                                   text-[#312525]
+                                   border border-[#8a7b70]
+                                   focus:outline-none
+                                   focus:ring-2
+                                   focus:ring-[#8a7b70]"
                         autoComplete="current-password"
                     />
                 </div>
 
                 {error && (
-                    <p className="text-red-700 text-sm">{error}</p>
+                    <p className="text-sm text-red-700">
+                        {error}
+                    </p>
                 )}
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="bg-amber-950 text-white py-1 rounded mt-2 disabled:opacity-60"
+                    className="mt-2 py-2 rounded-lg
+                               bg-[#594c41]
+                               text-[#ebe9e7]
+                               font-medium
+                               hover:bg-[#312525]
+                               transition
+                               disabled:opacity-60"
                 >
                     {loading ? "Logging in..." : "Login"}
                 </button>
