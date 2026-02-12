@@ -49,17 +49,17 @@ function Login() {
 
     return (
         <div className="w-full max-w-sm mx-auto mt-12 p-6
-                        bg-[#ebe9e7] rounded-xl
-                        border border-[#8a7b70] shadow">
+                        bg-theme-secondary rounded-xl
+                        border border-theme-color shadow-sm transition-colors duration-300">
 
-            <h2 className="text-xl font-semibold mb-5 text-center text-[#312525]">
+            <h2 className="text-xl font-semibold mb-5 text-center text-theme-primary">
                 Login
             </h2>
 
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
                 <div>
-                    <label className="block text-sm mb-1 text-[#594c41]">
+                    <label className="block text-sm mb-1 text-theme-secondary">
                         Email / Username / Mobile
                     </label>
                     <input
@@ -68,18 +68,18 @@ function Login() {
                         value={form.identifier}
                         onChange={handleChange}
                         className="w-full px-3 py-2 rounded
-                                   bg-[#ddd8d5]
-                                   text-[#312525]
-                                   border border-[#8a7b70]
+                                   bg-theme-input
+                                   text-theme-primary
+                                   border border-theme-color
                                    focus:outline-none
                                    focus:ring-2
-                                   focus:ring-[#8a7b70]"
+                                   focus:ring-theme-color"
                         autoComplete="username"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm mb-1 text-[#594c41]">
+                    <label className="block text-sm mb-1 text-theme-secondary">
                         Password
                     </label>
                     <input
@@ -88,18 +88,18 @@ function Login() {
                         value={form.password}
                         onChange={handleChange}
                         className="w-full px-3 py-2 rounded
-                                   bg-[#ddd8d5]
-                                   text-[#312525]
-                                   border border-[#8a7b70]
+                                   bg-theme-input
+                                   text-theme-primary
+                                   border border-theme-color
                                    focus:outline-none
                                    focus:ring-2
-                                   focus:ring-[#8a7b70]"
+                                   focus:ring-theme-color"
                         autoComplete="current-password"
                     />
                 </div>
 
                 {error && (
-                    <p className="text-sm text-red-700">
+                    <p className="text-sm text-red-500">
                         {error}
                     </p>
                 )}
@@ -108,12 +108,13 @@ function Login() {
                     type="submit"
                     disabled={loading}
                     className="mt-2 py-2 rounded-lg
-                               bg-[#594c41]
-                               text-[#ebe9e7]
+                               bg-theme-accent
+                               text-theme-primary
                                font-medium
-                               hover:bg-[#312525]
+                               hover:opacity-90
                                transition
                                disabled:opacity-60"
+                    style={{ color: 'var(--bg-primary)' }}
                 >
                     {loading ? "Logging in..." : "Login"}
                 </button>

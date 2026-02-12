@@ -1,1 +1,132 @@
 @import "tailwindcss";
+
+:root {
+    /* Default (Earth) Theme */
+    --bg-primary: #ebe9e7;
+    --bg-secondary: #f5f4f3;
+    --bg-tertiary: #ddd8d5;
+    --text-primary: #312525;
+    --text-secondary: #594c41;
+    --border-color: #8a7b70;
+    --accent-color: #594c41;
+    --accent-hover: #312525;
+    --input-bg: #ddd8d5;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+}
+
+[data-theme='dark'] {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-tertiary: #2d2d2d;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --border-color: #333333;
+    --accent-color: #bb86fc;
+    --accent-hover: #9965f4;
+    --input-bg: #2d2d2d;
+    --success-color: #34d399;
+    --error-color: #f87171;
+}
+
+[data-theme='light'] {
+    --bg-primary: #f8f9fa;
+    /* Main background */
+    --bg-secondary: #ffffff;
+    /* Cards / panels */
+    --bg-tertiary: #e9ecef;
+    /* Soft sections */
+
+    --text-primary: #212529;
+    /* Main text */
+    --text-secondary: #6c757d;
+    /* Muted text */
+
+    --border-color: #dee2e6;
+    /* Borders */
+
+    --accent-color: #3b82f6;
+    /* Primary blue */
+    --accent-hover: #2563eb;
+    /* Hover blue */
+
+    --input-bg: #ffffff;
+    /* Input fields */
+
+    --success-color: #16a34a;
+    /* Green */
+    --error-color: #dc2626;
+    /* Red */
+    --warning-color: #f59e0b;
+    /* Amber */
+}
+
+
+
+
+[data-theme='slate'] {
+    --bg-primary: #e5e7eb;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #d1d5db;
+
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+
+    --border-color: #cbd5e1;
+
+    --accent-color: #6366f1;
+    /* Indigo */
+    --accent-hover: #4f46e5;
+
+    --success-color: #16a34a;
+    --error-color: #dc2626;
+
+
+}
+
+
+
+/* Utility classes using CSS variables */
+.bg-theme-primary {
+    background-color: var(--bg-primary);
+}
+
+.bg-theme-secondary {
+    background-color: var(--bg-secondary);
+}
+
+.bg-theme-tertiary {
+    background-color: var(--bg-tertiary);
+}
+
+.text-theme-primary {
+    color: var(--text-primary);
+}
+
+.text-theme-secondary {
+    color: var(--text-secondary);
+}
+
+.text-theme-accent {
+    color: var(--accent-color);
+}
+
+.text-theme-accent-hover:hover {
+    color: var(--accent-hover);
+}
+
+.border-theme-color {
+    border-color: var(--border-color);
+}
+
+.bg-theme-input {
+    background-color: var(--input-bg);
+}
+
+.bg-theme-accent {
+    background-color: var(--accent-color);
+}
+
+.bg-theme-accent:hover {
+    background-color: var(--accent-hover);
+}

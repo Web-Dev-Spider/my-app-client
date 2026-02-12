@@ -38,36 +38,41 @@ import Welcome from './pages/Welcome'
 import About from './pages/About'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import Settings from './pages/Settings'
 import Layout from './layouts/Layout'
 import PageNotFound from './pages/PageNotFound'
 import KycPage from './pages/KycPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 import './app.css'
 function App() {
 
   return (
-    <AuthProvider >
-      <Routes>
+    <ThemeProvider>
+      <AuthProvider >
+        <Routes>
 
-        {/* Routes WITH Navbar */}
-        <Route element={<Layout />}>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/kyc" element={<KycPage />} />
+          {/* Routes WITH Navbar */}
+          <Route element={<Layout />}>
+            <Route path="/" element={<Welcome />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/kyc" element={<KycPage />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/*" element={<Navigate to="/" />} />
           </Route>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/*" element={<Navigate to="/" />} />
-        </Route>
 
-        {/* Routes WITHOUT Navbar */}
+          {/* Routes WITHOUT Navbar */}
 
-      </Routes>
-    </AuthProvider>
+        </Routes>
+      </AuthProvider>
+    </ThemeProvider>
 
   )
 }

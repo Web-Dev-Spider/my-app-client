@@ -40,26 +40,24 @@ function Register() {
     return (
         <div className="text-center">
 
-            <div className="flex justify-center items-center h-[70vh]">
+            <div className="flex justify-center items-center py-10">
 
                 <div
-                    className="p-8 rounded-xl shadow w-80
-                               bg-[#ebe9e7]
-                               border border-[#8a7b70]"
+                    className="p-8 rounded-xl shadow w-80 sm:w-96
+                               bg-theme-secondary
+                               border border-theme-color transition-colors duration-300"
                 >
 
-                    <h2 className="text-xl font-bold mb-5 text-[#312525]">
+                    <h2 className="text-xl font-bold mb-5 text-theme-primary">
                         Register
                     </h2>
 
                     <input
                         className="w-full mb-3 p-2 rounded
-                                   bg-[#ddd8d5]
-                                   text-[#312525]
-                                   border border-[#8a7b70]
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-[#8a7b70]"
+                                   bg-theme-input
+                                   text-theme-primary
+                                   border border-theme-color
+                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
                         name='gasAgencyName'
                         placeholder="Gas agency Name"
                         onChange={handleChange}
@@ -68,12 +66,10 @@ function Register() {
 
                     <select
                         className="w-full mb-3 p-2 rounded
-                                   bg-[#ddd8d5]
-                                   text-[#312525]
-                                   border border-[#8a7b70]
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-[#8a7b70]"
+                                   bg-theme-input
+                                   text-theme-primary
+                                   border border-theme-color
+                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
                         name='company'
                         onChange={handleChange}
                         value={registrationData.company}
@@ -86,12 +82,10 @@ function Register() {
 
                     <input
                         className="w-full mb-3 p-2 rounded
-                                   bg-[#ddd8d5]
-                                   text-[#312525]
-                                   border border-[#8a7b70]
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-[#8a7b70]"
+                                   bg-theme-input
+                                   text-theme-primary
+                                   border border-theme-color
+                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
                         name='sapcode'
                         placeholder="SAP Code"
                         onChange={handleChange}
@@ -100,12 +94,10 @@ function Register() {
 
                     <input
                         className="w-full mb-3 p-2 rounded
-                                   bg-[#ddd8d5]
-                                   text-[#312525]
-                                   border border-[#8a7b70]
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-[#8a7b70]"
+                                   bg-theme-input
+                                   text-theme-primary
+                                   border border-theme-color
+                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
                         name='email'
                         placeholder="Email"
                         onChange={handleChange}
@@ -114,12 +106,10 @@ function Register() {
 
                     <input
                         className="w-full mb-4 p-2 rounded
-                                   bg-[#ddd8d5]
-                                   text-[#312525]
-                                   border border-[#8a7b70]
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-[#8a7b70]"
+                                   bg-theme-input
+                                   text-theme-primary
+                                   border border-theme-color
+                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
                         name='password'
                         type="password"
                         placeholder="Password"
@@ -130,11 +120,11 @@ function Register() {
                     <button
                         onClick={handleRegister}
                         className="w-full py-2 rounded-lg
-                                   bg-[#594c41]
-                                   text-[#ebe9e7]
+                                   bg-theme-accent
                                    font-medium
-                                   hover:bg-[#312525]
+                                   hover:opacity-90
                                    transition"
+                        style={{ color: 'var(--bg-primary)' }}
                     >
                         Create Account
                     </button>
@@ -143,9 +133,9 @@ function Register() {
             </div>
 
             {loading && (
-                <div className="flex mx-auto w-fit items-center gap-2 text-[#594c41]">
+                <div className="flex mx-auto w-fit items-center gap-2 text-theme-secondary">
                     Creating the admin user for your agency… please wait
-                    <FaC className="animate-spin text-[#312525]" />
+                    <FaC className="animate-spin text-theme-primary" />
                 </div>
             )}
         </div>

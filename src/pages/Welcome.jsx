@@ -6,23 +6,23 @@ function Welcome() {
 
     return (
         <div className="min-h-[88vh] flex flex-col justify-center items-center
-                        bg-[#ebe9e7] text-center px-4">
-            {agency && (<h3 className="text-xl md:text-2xl mb-4 text-[#594c41]">
+                        bg-theme-primary text-center px-4 transition-colors duration-300">
+            {agency && (<h3 className="text-xl md:text-2xl mb-4 text-theme-secondary">
                 Agency:
-                <span className="ml-2 font-semibold text-[#312525]">
+                <span className="ml-2 font-semibold text-theme-primary">
                     {agency?.name || "—"}
                 </span>
             </h3>)}
 
 
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-[#312525]">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-theme-primary">
                 Welcome{" "}
                 {isAuthenticated ? (
-                    <span className="text-[#594c41]">
+                    <span className="text-theme-secondary">
                         {user?.role}
                     </span>
                 ) : (
-                    <span className="text-[#8a7b70]">
+                    <span className="text-theme-secondary opacity-70">
                         Guest
                     </span>
                 )}
