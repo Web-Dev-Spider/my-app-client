@@ -17,8 +17,8 @@ const KycPage = () => {
             dob: "",
             fatherOrSpouse: "",
             consumerNo: "",
-            mobileNo: "",
-            email: "",
+            mobNo: "",
+            emailId: "",
             hName: "",
             hNo: "",
             wardNo: "",
@@ -26,7 +26,7 @@ const KycPage = () => {
             landMark: "",
             cityTownVillage: "",
             districtName: "",
-            pincode: ""
+            pinCode: ""
         }
     })
 
@@ -77,7 +77,7 @@ const KycPage = () => {
                         error={errors.lName}
                     />
                     <Input
-                        labelText="DOB"
+                        labelText="Date of Birth"
                         type="date"
                         {...register("dob")}
                         error={errors.dob}
@@ -94,13 +94,18 @@ const KycPage = () => {
                     />
                     <Input
                         labelText="Mobile No"
-                        {...register("mobileNo")}
-                        error={errors.mobileNo}
+                        {...register("mobNo")}
+                        error={errors.mobNo}
+                    />
+                    <Input
+                        labelText="LandLine No"
+                        {...register("landLineNo")}
+                        error={errors.landLineNo}
                     />
                     <Input
                         labelText="Email"
-                        {...register("email")}
-                        error={errors.email}
+                        {...register("emailId")}
+                        error={errors.emailId}
                     />
                 </div>
 
@@ -149,8 +154,8 @@ const KycPage = () => {
                     />
                     <Input
                         labelText="Pincode"
-                        {...register("pincode")}
-                        error={errors.pincode}
+                        {...register("pinCode")}
+                        error={errors.pinCode}
                     />
                 </div>
 

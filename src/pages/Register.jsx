@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaC } from "react-icons/fa6";
+import { FaBuilding, FaIdBadge, FaEnvelope, FaLock } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'
 import api from '../axios/axiosInstance'
 
@@ -14,6 +14,7 @@ function Register() {
         password: '',
         company: ''
     })
+    const [error, setError] = useState("");
 
     const handleChange = (e) => {
         setRegistrationData({
@@ -24,6 +25,7 @@ function Register() {
 
     const handleRegister = async (e) => {
         e.preventDefault()
+        setError("");
         setLoading(true)
 
         try {
@@ -33,118 +35,150 @@ function Register() {
                 alert(res.data.message || `Registration successful! Please login with your email or username: admin_${registrationData.sapcode}`);
                 navigate('/login')
             } else {
-                alert(res.data.message || "Registration failed")
+                setError(res.data.message || "Registration failed")
             }
         } catch (error) {
             console.error("Registration error:", error);
             const msg = error.response?.data?.message || "An unexpected error occurred during registration.";
-            alert("Error alert" + msg);
+            setError(msg);
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="text-center">
+        <div className="w-full max-w-lg mx-auto mt-10 p-6 bg-theme-secondary rounded-xl border border-theme-color shadow-sm animate-fadeIn">
 
-            <div className="flex justify-center items-center py-10">
-
-                <div
-                    className="p-8 rounded-xl shadow w-80 sm:w-96
-                               bg-theme-secondary
-                               border border-theme-color transition-colors duration-300"
-                >
-
-                    <h2 className="text-xl font-bold mb-5 text-theme-primary">
-                        Register
-                    </h2>
-
-                    <input
-                        className="w-full mb-3 p-2 rounded
-                                   bg-theme-input
-                                   text-theme-primary
-                                   border border-theme-color
-                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
-                        name='gasAgencyName'
-                        placeholder="Gas agency Name"
-                        onChange={handleChange}
-                        value={registrationData.gasAgencyName}
-                    />
-
-                    <select
-                        className="w-full mb-3 p-2 rounded
-                                   bg-theme-input
-                                   text-theme-primary
-                                   border border-theme-color
-                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
-                        name='company'
-                        onChange={handleChange}
-                        value={registrationData.company}
-                    >
-                        <option value="">Select Company</option>
-                        <option value="IOCL">IOCL</option>
-                        <option value="HPCL">HPCL</option>
-                        <option value="BPCL">BPCL</option>
-                    </select>
-
-                    <input
-                        className="w-full mb-3 p-2 rounded
-                                   bg-theme-input
-                                   text-theme-primary
-                                   border border-theme-color
-                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
-                        name='sapcode'
-                        placeholder="SAP Code"
-                        onChange={handleChange}
-                        value={registrationData.sapcode}
-                    />
-
-                    <input
-                        className="w-full mb-3 p-2 rounded
-                                   bg-theme-input
-                                   text-theme-primary
-                                   border border-theme-color
-                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
-                        name='email'
-                        placeholder="Email"
-                        onChange={handleChange}
-                        value={registrationData.email}
-                    />
-
-                    <input
-                        className="w-full mb-4 p-2 rounded
-                                   bg-theme-input
-                                   text-theme-primary
-                                   border border-theme-color
-                                   focus:outline-none focus:ring-2 focus:ring-theme-color"
-                        name='password'
-                        type="password"
-                        placeholder="Password"
-                        onChange={handleChange}
-                        value={registrationData.password}
-                    />
-
-                    <button
-                        onClick={handleRegister}
-                        className="w-full py-2 rounded-lg
-                                   bg-theme-accent
-                                   font-medium
-                                   hover:opacity-90
-                                   transition"
-                        style={{ color: 'var(--bg-primary)' }}
-                    >
-                        Create Account
-                    </button>
-
-                </div>
+            <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-theme-primary">Register Agency</h2>
+                <p className="text-xs text-theme-secondary mt-1">Create a new account</p>
             </div>
 
-            {loading && (
-                <div className="flex mx-auto w-fit items-center gap-2 text-theme-secondary">
-                    Creating the admin user for your agency… please wait
-                    <FaC className="animate-spin text-theme-primary" />
+            <form onSubmit={handleRegister} className="space-y-3">
+
+                {/* Agency Name */}
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-theme-secondary pl-1">Agency Name</label>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            name='gasAgencyName'
+                            value={registrationData.gasAgencyName}
+                            onChange={handleChange}
+                            placeholder="Enter agency name"
+                            className="w-full px-4 py-2 pl-9 rounded-lg bg-theme-input text-theme-primary border border-theme-color focus:outline-none focus:ring-2 focus:ring-theme-accent transition-all text-sm placeholder-theme-secondary/50"
+                            required
+                        />
+                        <FaBuilding className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary text-xs" />
+                    </div>
                 </div>
-            )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Company Select */}
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-theme-secondary pl-1">Company</label>
+                        <div className="relative">
+                            <select
+                                name='company'
+                                value={registrationData.company}
+                                onChange={handleChange}
+                                className="w-full px-4 py-2 pl-9 rounded-lg bg-theme-input text-theme-primary border border-theme-color focus:outline-none focus:ring-2 focus:ring-theme-accent transition-all text-sm placeholder-theme-secondary/50 appearance-none"
+                                required
+                            >
+                                <option value="">Select</option>
+                                <option value="IOCL">IOCL</option>
+                                <option value="HPCL">HPCL</option>
+                                <option value="BPCL">BPCL</option>
+                            </select>
+                            <FaBuilding className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary text-xs" />
+                            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <svg className="w-4 h-4 text-theme-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* SAP Code */}
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-theme-secondary pl-1">SAP Code</label>
+                        <div className="relative">
+                            <input
+                                type="text"
+                                name='sapcode'
+                                value={registrationData.sapcode}
+                                onChange={handleChange}
+                                placeholder="SAP Code"
+                                className="w-full px-4 py-2 pl-9 rounded-lg bg-theme-input text-theme-primary border border-theme-color focus:outline-none focus:ring-2 focus:ring-theme-accent transition-all text-sm placeholder-theme-secondary/50"
+                                required
+                            />
+                            <FaIdBadge className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary text-xs" />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Email */}
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-theme-secondary pl-1">Email</label>
+                        <div className="relative">
+                            <input
+                                type="email"
+                                name='email'
+                                value={registrationData.email}
+                                onChange={handleChange}
+                                placeholder="Email"
+                                className="w-full px-4 py-2 pl-9 rounded-lg bg-theme-input text-theme-primary border border-theme-color focus:outline-none focus:ring-2 focus:ring-theme-accent transition-all text-sm placeholder-theme-secondary/50"
+                                required
+                            />
+                            <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary text-xs" />
+                        </div>
+                    </div>
+
+                    {/* Password */}
+                    <div className="space-y-1">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-theme-secondary pl-1">Password</label>
+                        <div className="relative">
+                            <input
+                                type="password"
+                                name='password'
+                                value={registrationData.password}
+                                onChange={handleChange}
+                                placeholder="Password"
+                                className="w-full px-4 py-2 pl-9 rounded-lg bg-theme-input text-theme-primary border border-theme-color focus:outline-none focus:ring-2 focus:ring-theme-accent transition-all text-sm placeholder-theme-secondary/50"
+                                required
+                            />
+                            <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary text-xs" />
+                        </div>
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs p-2 rounded-lg text-center font-medium animate-pulse">
+                        {error}
+                    </div>
+                )}
+
+                <button
+                    onClick={handleRegister}
+                    disabled={loading}
+                    className="w-full py-2.5 rounded-lg bg-theme-accent text-theme-primary font-bold shadow-md hover:shadow-lg hover:opacity-95 transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 text-sm mt-3"
+                    style={{ color: 'var(--bg-primary)' }}
+                >
+                    {loading ? (
+                        <>
+                            <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
+                            <span>Creating Account...</span>
+                        </>
+                    ) : (
+                        "Create Account"
+                    )}
+                </button>
+            </form>
+
+            <div className="mt-4 text-center">
+                <p className="text-xs text-theme-secondary" onClick={() => navigate('/login')}>
+                    Already have an account? <span className="text-theme-primary font-semibold hover:underline cursor-pointer">Login here</span>.
+                </p>
+            </div>
         </div>
     )
 }

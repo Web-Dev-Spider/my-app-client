@@ -70,6 +70,7 @@
     --bg-tertiary: #d1d5db;
 
     --text-primary: #1f2937;
+    /* --text-secondary: #0a52e2; */
     --text-secondary: #6b7280;
 
     --border-color: #cbd5e1;
@@ -129,21 +130,4 @@
 
 .bg-theme-accent:hover {
     background-color: var(--accent-hover);
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fadeIn {
-    animation: fadeIn 0.4s ease-out forwards;
 }

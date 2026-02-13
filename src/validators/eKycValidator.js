@@ -18,16 +18,17 @@ export const eKycSchema = z.object({
 
     fatherOrSpouse: z.string().trim().min(2, "Father/Spouse name is required"),
     consumerNo: z.string().trim().max(10, "Consumer number must be at most 10 characters").optional().or(z.literal("")),
-    mobileNo: z.string().trim().regex(/^[0-9]{10}$/, "Mobile number must be 10 digits"),
-    email: z.string().email("Invalid email address").trim(),
+    mobNo: z.string().trim().regex(/^[0-9]{10}$/, "Mobile number must be 10 digits"),
+    emailId: z.string().email("Invalid email address").trim().max(26, "Maximum 26 characters allowed"),
+    landLineNo: z.string().trim().max(12, "Maximum 12 characters allowed"),
 
     // Address Details
     hName: z.string().trim().min(1, "House/Flat Name is required"),
-    hNo: z.string().trim().min(1, "House No is required"),
-    wardNo: z.string().trim().min(1, "Ward No is required"),
-    roadName: z.string().trim().optional(),
-    landMark: z.string().trim().optional(),
-    cityTownVillage: z.string().trim().min(2, "City/Town/Village is required"),
+    hNo: z.string().trim().max(4, "Maximum 4 characters allowed").optional(),
+    wardNo: z.string().trim().max(4, "Maximum 4 characters allowed").optional(),
+    roadName: z.string().trim().max(26, "Maximum 26 characters allowed"),
+    landMark: z.string().trim().max(17, "Maximum 17 characters allowed"),
+    cityTownVillage: z.string().trim().min(2, "City/Town/Village is required").max(16, "Maximum 16 characters allowed"),
     districtName: z.string().trim().min(2, "District is required"), // Assuming auto-filled or select, but likely text input for now
-    pincode: z.string().trim().regex(/^[0-9]{6}$/, "Pincode must be 6 digits"),
+    pinCode: z.string().trim().regex(/^[0-9]{6}$/, "Pincode must be 6 digits").min(6, "Pincode must be 6 digits").max(6, "Pincode must be 6 digits"),
 });

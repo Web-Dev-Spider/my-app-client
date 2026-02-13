@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { FaUser, FaLock } from 'react-icons/fa';
 
 function Login() {
     const navigate = useNavigate();
     const { login } = useAuth();
-
     const [form, setForm] = useState({
         identifier: "",
         password: ""
     });
-
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
@@ -23,7 +22,6 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         setError("");
         setLoading(true);
 
@@ -37,10 +35,8 @@ function Login() {
             }
 
         } catch (err) {
-            const msg =
-                err.response?.data?.message ||
-                "Unable to login. Please try again.";
-
+            console.error(err);
+            const msg = err.response?.data?.message || "Unable to login. Please try again.";
             setError(msg);
         } finally {
             setLoading(false);
@@ -48,78 +44,76 @@ function Login() {
     };
 
     return (
-        <div className="w-full max-w-sm mx-auto mt-12 p-6
-                        bg-theme-secondary rounded-xl
-                        border border-theme-color shadow-sm transition-colors duration-300">
+        <div className="w-full max-w-sm mx-auto mt-20 p-8 bg-theme-secondary rounded-xl border border-theme-color shadow-sm animate-fadeIn">
 
-            <h2 className="text-xl font-semibold mb-5 text-center text-theme-primary">
-                Login
-            </h2>
+            <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-theme-primary">Login</h2>
+                <p className="text-sm text-theme-secondary mt-1">Access your account</p>
+            </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-
-                <div>
-                    <label className="block text-sm mb-1 text-theme-secondary">
-                        Email / Username / Mobile
-                    </label>
-                    <input
-                        type="text"
-                        name="identifier"
-                        value={form.identifier}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded
-                                   bg-theme-input
-                                   text-theme-primary
-                                   border border-theme-color
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-theme-color"
-                        autoComplete="username"
-                    />
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-theme-secondary pl-1">Email / Username</label>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            name="identifier"
+                            value={form.identifier}
+                            onChange={handleChange}
+                            placeholder="username"
+                            className="w-full px-4 py-2.5 pl-10 rounded-lg bg-theme-input text-theme-primary border border-theme-color focus:outline-none focus:ring-2 focus:ring-theme-accent transition-all text-sm placeholder-theme-secondary/50"
+                            required
+                            autoComplete="username"
+                        />
+                        <FaUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary text-xs" />
+                    </div>
                 </div>
 
-                <div>
-                    <label className="block text-sm mb-1 text-theme-secondary">
-                        Password
-                    </label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={form.password}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 rounded
-                                   bg-theme-input
-                                   text-theme-primary
-                                   border border-theme-color
-                                   focus:outline-none
-                                   focus:ring-2
-                                   focus:ring-theme-color"
-                        autoComplete="current-password"
-                    />
+                <div className="space-y-1">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-theme-secondary pl-1">Password</label>
+                    <div className="relative">
+                        <input
+                            type="password"
+                            name="password"
+                            value={form.password}
+                            onChange={handleChange}
+                            placeholder="password"
+                            className="w-full px-4 py-2.5 pl-10 rounded-lg bg-theme-input text-theme-primary border border-theme-color focus:outline-none focus:ring-2 focus:ring-theme-accent transition-all text-sm placeholder-theme-secondary/50"
+                            required
+                            autoComplete="current-password"
+                        />
+                        <FaLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-theme-secondary text-xs" />
+                    </div>
                 </div>
 
                 {error && (
-                    <p className="text-sm text-red-500">
+                    <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-xs p-3 rounded-lg text-center font-medium animate-pulse">
                         {error}
-                    </p>
+                    </div>
                 )}
 
                 <button
                     type="submit"
                     disabled={loading}
-                    className="mt-2 py-2 rounded-lg
-                               bg-theme-accent
-                               text-theme-primary
-                               font-medium
-                               hover:opacity-90
-                               transition
-                               disabled:opacity-60"
+                    className="w-full py-2.5 rounded-lg bg-theme-accent text-theme-primary font-bold shadow-md hover:shadow-lg hover:opacity-95 transform active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 text-sm"
                     style={{ color: 'var(--bg-primary)' }}
                 >
-                    {loading ? "Logging in..." : "Login"}
+                    {loading ? (
+                        <>
+                            <span className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></span>
+                            <span>Logging in...</span>
+                        </>
+                    ) : (
+                        "Login"
+                    )}
                 </button>
-
             </form>
+
+            <div className="mt-6 text-center">
+                <p className="text-xs text-theme-secondary hover:text-theme-primary transition-colors cursor-pointer">
+                    Forgot password? Contact Admin.
+                </p>
+            </div>
         </div>
     );
 }
