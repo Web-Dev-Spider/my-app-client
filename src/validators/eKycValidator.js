@@ -6,11 +6,7 @@ export const eKycSchema = z.object({
     fName: z.string().trim().min(2, "First Name must be at least 2 characters"),
     mName: z.string().trim().optional(),
     lName: z.string().trim().min(1, "Last Name is required"),
-    // dob: z.coerce.date().refine((date) => {
-    //     const today = new Date();
-    //     const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-    //     return date <= minAgeDate;
-    // }, { message: "You must be at least 18 years old" }),
+
     dob: z.string()
         .min(1, { message: "DOB is required" })
         .transform((val) => new Date(val))
@@ -19,11 +15,6 @@ export const eKycSchema = z.object({
             const minAgeDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
             return date <= minAgeDate;
         }, { message: "Customer must be at least 18 years old" }),
-
-
-
-
-
 
     fatherOrSpouse: z.string().trim().min(2, "Father/Spouse name is required"),
     consumerNo: z.string().trim().max(10, "Consumer number must be at most 10 characters").optional().or(z.literal("")),

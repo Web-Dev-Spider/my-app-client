@@ -26,14 +26,21 @@ function Register() {
         e.preventDefault()
         setLoading(true)
 
-        const res = await api.post(`/auth/register`, registrationData)
+        try {
+            const res = await api.post(`/auth/register`, registrationData)
 
-        setLoading(false)
-
-        if (res.data.success) {
-            navigate('/dashboard')
-        } else {
-            alert(res.data.message)
+            if (res.data.success) {
+                alert(res.data.message || `Registration successful! Please login with your email or username: admin_${registrationData.sapcode}`);
+                navigate('/login')
+            } else {
+                alert(res.data.message || "Registration failed")
+            }
+        } catch (error) {
+            console.error("Registration error:", error);
+            const msg = error.response?.data?.message || "An unexpected error occurred during registration.";
+            alert("Error alert" + msg);
+        } finally {
+            setLoading(false)
         }
     }
 

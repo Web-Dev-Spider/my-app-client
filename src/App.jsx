@@ -45,6 +45,8 @@ import KycPage from './pages/KycPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './context/AuthContext'
 import { ThemeProvider } from './context/ThemeContext'
+import SuperAdminDashboard from './pages/SuperAdminDashboard'
+import SuperAdminLogin from './pages/SuperAdminLogin'
 import './app.css'
 function App() {
 
@@ -65,11 +67,15 @@ function App() {
             </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/*" element={<Navigate to="/" />} />
           </Route>
 
-          {/* Routes WITHOUT Navbar */}
+          {/* Super Admin Routes (Outside standard layout) */}
+          <Route path="/super-admin/login" element={<SuperAdminLogin />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+          </Route>
 
+          <Route path="/*" element={<Navigate to="/" />} />
         </Routes>
       </AuthProvider>
     </ThemeProvider>
