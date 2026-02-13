@@ -1,21 +1,23 @@
-import React from 'react'
+import React, { forwardRef } from 'react';
 
-const Input = ({ labelText, type = "text", name, value, onChange, options, horizontal = false }) => {
-    const className = 'flex flex-col bg-theme-secondary px-3 py-1 gap-1 rounded-md shadow-sm border-theme-color transition-colors duration-200'
+const Input = forwardRef(({ labelText, type = "text", name, error, options, horizontal = false, ...rest }, ref) => {
+    const className = 'flex flex-col bg-theme-secondary px-3 py-1 gap-1 rounded-md shadow-sm border-theme-color transition-colors duration-200';
 
     return (
         <div className={horizontal ? 'flex items-center gap-2' : className}>
-            <label htmlFor={name} className="text-xs font-medium text-theme-secondary">{labelText}</label>
+            <label htmlFor={name} className="text-xs font-medium text-theme-secondary">
+                {labelText} {rest.required && <span className="text-error-color">*</span>}
+            </label>
             {type === "select" ? (
                 <select
                     id={name}
-                    className='bg-theme-input text-theme-primary text-sm p-1 rounded border border-theme-color focus:outline-none focus:ring-1 focus:ring-theme-accent'
-                    onChange={onChange}
-                    value={value}
+                    ref={ref}
+                    className={`bg-theme-input text-theme-primary text-sm p-1 rounded border focus:outline-none focus:ring-1 focus:ring-theme-accent ${error ? 'border-error-color' : 'border-theme-color'}`}
                     name={name}
+                    {...rest}
                 >
                     <option value="">Select</option>
-                    {options.map((option) => (
+                    {options && options.map((option) => (
                         <option key={option.value} value={option.value}>
                             {option.label}
                         </option>
@@ -25,15 +27,15 @@ const Input = ({ labelText, type = "text", name, value, onChange, options, horiz
                 <input
                     id={name}
                     type={type}
-                    className='bg-theme-input text-theme-primary text-sm p-1 rounded border border-theme-color focus:outline-none focus:ring-1 focus:ring-theme-accent hover:border-theme-accent transition-colors'
+                    ref={ref}
+                    className={`bg-theme-input text-theme-primary text-sm p-1 rounded border focus:outline-none focus:ring-1 focus:ring-theme-accent hover:border-theme-accent transition-colors ${error ? 'border-error-color' : 'border-theme-color'}`}
                     name={name}
-                    onChange={onChange}
-                    value={value}
+                    {...rest}
                 />
             )}
-
+            {error && <span className="text-xs text-error-color mt-1">{error.message}</span>}
         </div>
-    )
-}
+    );
+});
 
-export default Input
+export default Input;

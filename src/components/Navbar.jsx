@@ -27,7 +27,7 @@ function Navbar() {
                     {/* Logo / Brand */}
                     <div className="flex-shrink-0 flex items-center">
                         <NavLink to="/" className="text-2xl font-serif font-bold text-theme-primary hover:text-theme-secondary tracking-tight transition-transform duration-200 hover:scale-105">
-                            MyApp
+                            D-Friend
                         </NavLink>
                     </div>
 
