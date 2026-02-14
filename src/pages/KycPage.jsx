@@ -26,7 +26,8 @@ const KycPage = () => {
             landMark: "",
             cityTownVillage: "",
             districtName: "",
-            pinCode: ""
+            pinCode: "",
+            docDate: new Date().toLocaleDateString('en-CA')
         }
     })
 
@@ -156,6 +157,23 @@ const KycPage = () => {
                         labelText="Pincode"
                         {...register("pinCode")}
                         error={errors.pinCode}
+                    />
+                    <Input
+                        labelText="Ration Card State"
+                        {...register("rationCardState")}
+                        error={errors.rationCardState}
+                    />
+                    <Input
+                        labelText="Ration Card Number"
+                        {...register("rationCardNo")}
+                        error={errors.rationCardNo}
+
+                    />
+                    <Input
+                        labelText="Document Date"
+                        type="date"
+                        {...register("docDate")}
+                        error={errors.docDate}
                     />
                 </div>
 

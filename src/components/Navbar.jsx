@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FaBars, FaTimes, FaUserCircle, FaChevronDown } from 'react-icons/fa';
 import { NavLink } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
@@ -7,12 +7,26 @@ function Navbar() {
     const { isAuthenticated, user, logout } = useAuth();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const profileMenuRef = useRef(null);
 
     const linkClass = ({ isActive }) =>
         `font-medium text-sm tracking-wide transition-colors duration-200 ${isActive
             ? "text-theme-primary border-b-2 border-theme-accent"
             : "text-theme-secondary hover:text-theme-primary"
         }`;
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+                setIsProfileOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     const handleLogout = () => {
         setIsProfileOpen(false);
@@ -65,7 +79,7 @@ function Navbar() {
                     {/* Right Side: Auth / Profile */}
                     <div className="hidden md:flex items-center space-x-4">
                         {isAuthenticated ? (
-                            <div className="relative">
+                            <div className="relative" ref={profileMenuRef}>
                                 <button
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                                     className="flex items-center space-x-2 text-theme-primary hover:text-theme-secondary focus:outline-none transition-colors px-2 py-1 rounded-md hover:bg-theme-tertiary"

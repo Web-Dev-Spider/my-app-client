@@ -17,18 +17,21 @@ export const eKycSchema = z.object({
         }, { message: "Customer must be at least 18 years old" }),
 
     fatherOrSpouse: z.string().trim().min(2, "Father/Spouse name is required"),
-    consumerNo: z.string().trim().max(10, "Consumer number must be at most 10 characters").optional().or(z.literal("")),
+    consumerNo: z.string().trim().max(10, "Consumer number must be at most 10 characters").optional().or(z.literal("")).transform(v => v ? v.toUpperCase() : v),
     mobNo: z.string().trim().regex(/^[0-9]{10}$/, "Mobile number must be 10 digits"),
     emailId: z.string().email("Invalid email address").trim().max(26, "Maximum 26 characters allowed"),
     landLineNo: z.string().trim().max(12, "Maximum 12 characters allowed"),
 
     // Address Details
-    hName: z.string().trim().min(1, "House/Flat Name is required"),
+    hName: z.string().trim().max(18, "Maximum 18 characters allowed"),
     hNo: z.string().trim().max(4, "Maximum 4 characters allowed").optional(),
     wardNo: z.string().trim().max(4, "Maximum 4 characters allowed").optional(),
     roadName: z.string().trim().max(26, "Maximum 26 characters allowed"),
     landMark: z.string().trim().max(17, "Maximum 17 characters allowed"),
     cityTownVillage: z.string().trim().min(2, "City/Town/Village is required").max(16, "Maximum 16 characters allowed"),
-    districtName: z.string().trim().min(2, "District is required"), // Assuming auto-filled or select, but likely text input for now
+    districtName: z.string().trim().min(2, "District is required").max(13, "Maximum 13 characters allowed"), // Assuming auto-filled or select, but likely text input for now
     pinCode: z.string().trim().regex(/^[0-9]{6}$/, "Pincode must be 6 digits").min(6, "Pincode must be 6 digits").max(6, "Pincode must be 6 digits"),
-});
+    rationCardNo: z.string().trim().regex(/^[0-9]{12}$/, "Ration Card Number must be 12 digits").min(12, "Ration Card Number must be 12 digits").max(12, "Ration Card Number must be 12 digits"),
+    rationCardState: z.string().trim().min(3, "Ration Card State is required").max(13, "Maximum 13 characters allowed"),
+    docDate: z.coerce.date().default(() => new Date())
+}); 

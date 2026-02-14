@@ -33,7 +33,7 @@ const Input = forwardRef(({ labelText, type = "text", name, error, options, hori
                     {...rest}
                 />
             )}
-            {error && <span className="text-xs text-error-color mt-1">{error.message}</span>}
+            {error && <span className="text-xs text-error-color">{error.message}</span>}
         </div>
     );
 });

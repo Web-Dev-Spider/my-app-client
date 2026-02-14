@@ -131,3 +131,11 @@
 .bg-theme-accent:hover {
     background-color: var(--accent-hover);
 }
+
+.text-error-color {
+    color: var(--error-color);
+}
+
+.border-error-color {
+    border-color: var(--error-color);
+}
