@@ -38,6 +38,7 @@ const UserManagementForm = () => {
 
     const roles = [
         "MANAGER",
+        "ACCOUNTANT",
         "SHOWROOM-STAFF",
         "DELIVERY-BOY-DRIVER",
         "DELIVERY-BOY",
@@ -180,16 +181,19 @@ const UserManagementForm = () => {
 
     const [selectedRole, setSelectedRole] = useState(null);
 
+    // Filter out Admins from the view entirely
+    const staffUsers = users.filter(u => u.role !== 'ADMIN' && u.role !== 'SUPER-ADMIN');
+
     // Calculate total stats from users array
     const totalStats = {
-        total: users.length,
-        active: users.filter(u => u.isActive).length,
-        inactive: users.filter(u => !u.isActive).length
+        total: staffUsers.length,
+        active: staffUsers.filter(u => u.isActive).length,
+        inactive: staffUsers.filter(u => !u.isActive).length
     };
 
     const filteredUsers = selectedRole
-        ? users.filter(user => user.role === selectedRole)
-        : users;
+        ? staffUsers.filter(user => user.role === selectedRole)
+        : staffUsers;
 
     if (view === 'list') {
         return (
@@ -207,7 +211,7 @@ const UserManagementForm = () => {
                         <h5 className={`text-xs uppercase font-semibold mb-2 ${selectedRole === null ? 'text-white/90' : 'text-theme-accent'}`}>Total Staffs</h5>
                         <div className="flex justify-between items-end">
                             <span className={`text-2xl font-bold ${selectedRole === null ? 'text-white' : 'text-theme-accent'}`}>{totalStats.total}</span>
-                            <div className={`text-xs text-right ${selectedRole === null ? 'text-white/80' : 'text-theme-secondary'}`}>
+                            <div className={`text-xs text-left ${selectedRole === null ? 'text-white/80' : 'text-theme-secondary'}`}>
                                 <div><span className="font-medium">{totalStats.active}</span> Active</div>
                                 <div><span className="font-medium">{totalStats.inactive}</span> Inactive</div>
                             </div>
@@ -223,18 +227,18 @@ const UserManagementForm = () => {
                                 key={role}
                                 onClick={() => setSelectedRole(role)}
                                 className={`p-4 rounded-xl border shadow-sm cursor-pointer transition-all ${isSelected
-                                    ? 'bg-theme-primary text-theme-secondary border-theme-primary ring-2 ring-theme-primary/50'
+                                    ? 'bg-blue-100 border-blue-300 ring-2 ring-blue-300/50'
                                     : 'bg-theme-secondary border-theme-color hover:bg-theme-tertiary'
                                     }`}
                             >
-                                <h5 className={`text-xs uppercase font-semibold mb-2 truncate ${isSelected ? 'text-white' : 'text-theme-secondary'}`} title={role.replace(/-/g, ' ')}>
+                                <h5 className={`text-xs uppercase font-bold mb-2 truncate ${isSelected ? 'text-blue-900' : 'text-theme-secondary'}`} title={role.replace(/-/g, ' ')}>
                                     {role.replace(/-/g, ' ')}
                                 </h5>
                                 <div className="flex justify-between items-end">
-                                    <span className={`text-2xl font-bold ${isSelected ? 'text-white' : 'text-theme-primary'}`}>{roleStats.total}</span>
-                                    <div className={`text-xs text-right ${isSelected ? 'text-white/80' : 'text-theme-secondary'}`}>
-                                        <div className={!isSelected ? "text-green-600" : ""}><span className="font-medium">{roleStats.active}</span> Active</div>
-                                        <div className={!isSelected ? "text-red-600" : ""}><span className="font-medium">{roleStats.inactive}</span> Inactive</div>
+                                    <span className={`text-2xl font-bold ${isSelected ? 'text-blue-900' : 'text-theme-primary'}`}>{roleStats.total}</span>
+                                    <div className={`text-xs text-left ${isSelected ? 'text-blue-800' : 'text-theme-secondary'}`}>
+                                        <div className={isSelected ? "text-blue-900" : "text-green-600"}><span className="font-semibold">{roleStats.active}</span> Active</div>
+                                        <div className={isSelected ? "text-blue-900" : "text-red-600"}><span className="font-semibold">{roleStats.inactive}</span> Inactive</div>
                                     </div>
                                 </div>
                             </div>

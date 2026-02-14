@@ -30,12 +30,7 @@ const Dashboard = () => {
         }
     };
 
-    const filteredUsers = users.filter(u =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.role?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const staffUsers = users.filter(u => u.role !== 'ADMIN' && u.role !== 'SUPER-ADMIN');
 
     if (loading) {
         return (
@@ -60,7 +55,9 @@ const Dashboard = () => {
                         <div className="flex items-center gap-2">
                             <FaUsers className="text-theme-accent text-xl" />
                             <h2 className="text-xl font-bold">Team Members</h2>
-                            <span className="bg-theme-tertiary text-theme-secondary text-xs px-2 py-1 rounded-full">{users.length} Users</span>
+                            <span className="bg-theme-tertiary text-theme-secondary text-xs px-2 py-1 rounded-full">
+                                {staffUsers.length} Staffs
+                            </span>
                         </div>
 
                         <div className="relative w-full md:w-64">
@@ -87,48 +84,62 @@ const Dashboard = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-theme-color">
-                                {filteredUsers.length > 0 ? (
-                                    filteredUsers.map((u) => (
-                                        <tr key={u._id} className="hover:bg-theme-tertiary/30 transition-colors">
-                                            <td className="p-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-theme-accent/10 flex items-center justify-center text-theme-accent font-bold">
-                                                        {u.name?.charAt(0).toUpperCase()}
+                                {staffUsers
+                                    .filter(u =>
+                                        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                        u.role?.toLowerCase().includes(searchTerm.toLowerCase())
+                                    )
+                                    .length > 0 ? (
+                                    staffUsers
+                                        .filter(u =>
+                                            u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                            u.role?.toLowerCase().includes(searchTerm.toLowerCase())
+                                        )
+                                        .map((u) => (
+                                            <tr key={u._id} className="hover:bg-theme-tertiary/30 transition-colors">
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-10 h-10 rounded-full bg-theme-accent text-white flex items-center justify-center font-bold">
+                                                            {u.name?.charAt(0).toUpperCase()}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-semibold text-theme-primary">{u.name}</p>
+                                                            <p className="text-xs text-theme-secondary opacity-75">@{u.username}</p>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="font-semibold text-theme-primary">{u.name}</p>
-                                                        <p className="text-xs text-theme-secondary">@{u.username}</p>
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+                                                        <FaUserTag className="text-[10px]" />
+                                                        {u.role.replace('_', ' ')}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center gap-2 text-sm text-theme-secondary">
+                                                            <FaEnvelope className="text-xs" />
+                                                            {u.email}
+                                                        </div>
+                                                        <div className="flex items-center gap-2 text-sm text-theme-secondary">
+                                                            <FaPhone className="text-xs" />
+                                                            {u.mobile}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
-                                                    <FaUserTag className="text-[10px]" />
-                                                    {u.role.replace('_', ' ')}
-                                                </span>
-                                            </td>
-                                            <td className="p-4">
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2 text-sm text-theme-secondary">
-                                                        <FaEnvelope className="text-xs" />
-                                                        {u.email}
-                                                    </div>
-                                                    <div className="flex items-center gap-2 text-sm text-theme-secondary">
-                                                        <FaPhone className="text-xs" />
-                                                        {u.mobile}
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="p-4">
-                                                <span className={`px-2 py-1 rounded text-xs font-medium ${u.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                    {u.isActive ? 'Active' : 'Inactive'}
-                                                </span>
-                                            </td>
-                                            <td className="p-4 text-sm text-theme-secondary">
-                                                {new Date(u.createdAt).toLocaleDateString()}
-                                            </td>
-                                        </tr>
-                                    ))
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium ${u.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                        {u.isActive ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-sm text-theme-secondary">
+                                                    {new Date(u.createdAt).toLocaleDateString()}
+                                                </td>
+                                            </tr>
+                                        ))
                                 ) : (
                                     <tr>
                                         <td colSpan="5" className="p-8 text-center text-theme-secondary">
