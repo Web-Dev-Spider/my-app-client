@@ -109,10 +109,16 @@ function Login() {
                 </button>
             </form>
 
-            <div className="mt-6 text-center">
-                <Link to="/forgot-password" className="text-xs text-theme-secondary hover:text-theme-primary transition-colors cursor-pointer">
+            <div className="mt-6 text-center space-y-3">
+                <Link to="/forgot-password" className="text-xs text-theme-secondary hover:text-theme-primary transition-colors cursor-pointer block">
                     Forgot password?
                 </Link>
+                <div className="text-xs text-theme-secondary">
+                    Don't have an account?{' '}
+                    <Link to="/register" className="font-semibold text-theme-accent hover:underline ml-1">
+                        Register
+                    </Link>
+                </div>
             </div>
         </div>
     );

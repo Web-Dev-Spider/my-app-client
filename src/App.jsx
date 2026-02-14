@@ -50,6 +50,8 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import SuperAdminDashboard from './pages/SuperAdminDashboard'
 import SuperAdminLogin from './pages/SuperAdminLogin'
+import PrivacyPolicy from './pages/PrivacyPolicy'
+import TermsOfService from './pages/TermsOfService'
 import './app.css'
 function App() {
 
@@ -63,6 +65,8 @@ function App() {
             <Route path="/" element={<Welcome />} />
             <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/kyc" element={<KycPage />} />
