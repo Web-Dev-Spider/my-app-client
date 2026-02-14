@@ -1,10 +1,204 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import api from '../axios/axiosInstance';
 import { FaCog, FaPalette, FaUser, FaBell, FaLock, FaChevronRight } from 'react-icons/fa';
+
+const UserManagementForm = () => {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        mobile: '',
+        username: '',
+        password: '',
+        role: ''
+    });
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
+
+    const roles = [
+        "MANAGER",
+        "SHOWROOM-STAFF",
+        "DELIVERY-BOY-DRIVER",
+        "DELIVERY-BOY",
+        "MECHANIC",
+        "GODOWN-KEEPER",
+        "TRUCK-DRIVER"
+    ];
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+
+        try {
+            const res = await api.post('/admin/create-user', formData);
+            if (res.data.success) {
+                setMessage({ type: 'success', text: 'User created successfully' });
+                setFormData({
+                    name: '',
+                    email: '',
+                    mobile: '',
+                    username: '',
+                    password: '',
+                    role: ''
+                });
+            }
+        } catch (error) {
+            setMessage({ type: 'error', text: error.response?.data?.message || 'Error creating user' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="p-6 bg-theme-secondary rounded-xl border border-theme-color space-y-4" autoComplete="off">
+            {message.text && (
+                <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {message.text}
+                </div>
+            )}
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-theme-secondary mb-1">Name</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                        required
+                        autoComplete="new-name"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-theme-secondary mb-1">Email</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                        autoComplete="new-email"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-theme-secondary mb-1">Mobile</label>
+                    <input
+                        type="text"
+                        name="mobile"
+                        value={formData.mobile}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                        required
+                        autoComplete="new-mobile"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-theme-secondary mb-1">Username</label>
+                    <input
+                        type="text"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                        required
+                        autoComplete="new-username"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-theme-secondary mb-1">Password</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                        required
+                        autoComplete="new-password"
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-theme-secondary mb-1">Role</label>
+                    <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                    >
+                        <option value="" disabled>Select Role</option>
+                        {roles.map(role => (
+                            <option key={role} value={role}>{role}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
+
+            <div className="pt-4 flex justify-end">
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={`px-6 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${loading ? 'bg-theme-secondary cursor-not-allowed' : 'bg-theme-accent hover:bg-theme-accent/90'}`}
+                >
+                    {loading ? 'Creating...' : 'Create User'}
+                </button>
+            </div>
+        </form>
+    );
+};
+
+// ... existing Settings component ...
 
 const Settings = () => {
     const { theme, setTheme } = useTheme();
+    const { user, setUser } = useAuth();
     const [activeTab, setActiveTab] = useState('appearance');
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        mobile: '',
+        username: ''
+    });
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState({ type: '', text: '' });
+
+    useEffect(() => {
+        if (user) {
+            setFormData({
+                name: user.name || '',
+                email: user.email || '',
+                mobile: user.mobile || '',
+                username: user.username || ''
+            });
+        }
+    }, [user]);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleUpdateProfile = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setMessage({ type: '', text: '' });
+        try {
+            const res = await api.put('/auth/update-profile', formData);
+            if (res.data.success) {
+                setUser(res.data.user);
+                setMessage({ type: 'success', text: 'Profile updated successfully' });
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage({ type: 'error', text: error.response?.data?.message || 'Error updating profile' });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const themes = [
         { id: 'earth', name: 'Earth', color: '#ebe9e7', description: 'Natural and grounded' },
@@ -19,6 +213,7 @@ const Settings = () => {
         { id: 'account', label: 'Account', icon: FaUser },
         { id: 'notifications', label: 'Notifications', icon: FaBell },
         { id: 'security', label: 'Security', icon: FaLock },
+        ...(user?.role === 'ADMIN' ? [{ id: 'users', label: 'Manage Users', icon: FaUser }] : []),
     ];
 
     const renderContent = () => {
@@ -37,8 +232,8 @@ const Settings = () => {
                                     key={t.id}
                                     onClick={() => setTheme(t.id)}
                                     className={`relative p-4 rounded-xl border-2 text-left transition-all duration-200 group ${theme === t.id
-                                            ? 'border-theme-accent bg-theme-tertiary shadow-md'
-                                            : 'border-theme-color hover:border-theme-accent/50 hover:bg-theme-tertiary/50'
+                                        ? 'border-theme-accent bg-theme-tertiary shadow-md'
+                                        : 'border-theme-color hover:border-theme-accent/50 hover:bg-theme-tertiary/50'
                                         }`}
                                 >
                                     <div className="flex items-center gap-4">
@@ -90,15 +285,86 @@ const Settings = () => {
                 );
             case 'account':
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-6 animate-fadeIn">
                         <div>
                             <h3 className="text-xl font-bold text-theme-primary mb-1">Account Settings</h3>
                             <p className="text-sm text-theme-secondary">Update your personal information.</p>
                         </div>
-                        <div className="p-6 bg-theme-secondary rounded-xl border border-theme-color text-center py-12">
-                            <FaUser className="mx-auto text-4xl text-theme-secondary mb-3 opacity-50" />
-                            <p className="text-theme-secondary">Account details form coming soon.</p>
+
+                        <form onSubmit={handleUpdateProfile} className="p-6 bg-theme-secondary rounded-xl border border-theme-color space-y-4">
+                            {message.text && (
+                                <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                    {message.text}
+                                </div>
+                            )}
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-theme-secondary mb-1">Full Name</label>
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                                        placeholder="Your Name"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-theme-secondary mb-1">Username</label>
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        value={formData.username}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                                        placeholder="Username"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-theme-secondary mb-1">Email</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                                        placeholder="Email Address"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-theme-secondary mb-1">Mobile</label>
+                                    <input
+                                        type="text"
+                                        name="mobile"
+                                        value={formData.mobile}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-2 rounded-lg border border-theme-color bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-accent/50"
+                                        placeholder="Mobile Number"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="pt-4 flex justify-end">
+                                <button
+                                    type="submit"
+                                    disabled={loading}
+                                    className={`px-6 py-2 rounded-lg font-medium text-white transition-colors duration-200 ${loading ? 'bg-theme-secondary cursor-not-allowed' : 'bg-theme-accent hover:bg-theme-accent/90'}`}
+                                >
+                                    {loading ? 'Saving...' : 'Save Changes'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                );
+            case 'users':
+                return (
+                    <div className="space-y-6 animate-fadeIn">
+                        <div>
+                            <h3 className="text-xl font-bold text-theme-primary mb-1">Manage Users</h3>
+                            <p className="text-sm text-theme-secondary">Create and manage staff accounts.</p>
                         </div>
+                        <UserManagementForm />
                     </div>
                 );
             default:
@@ -130,8 +396,8 @@ const Settings = () => {
                                         key={tab.id}
                                         onClick={() => setActiveTab(tab.id)}
                                         className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${isActive
-                                                ? 'bg-theme-primary text-theme-primary shadow-sm ring-1 ring-theme-color/50'
-                                                : 'text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary'
+                                            ? 'bg-theme-primary text-theme-primary shadow-sm ring-1 ring-theme-color/50'
+                                            : 'text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary'
                                             }`}
                                     >
                                         <div className="flex items-center gap-3">

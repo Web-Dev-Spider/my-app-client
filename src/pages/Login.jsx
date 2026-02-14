@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FaUser, FaLock } from 'react-icons/fa';
 
@@ -110,9 +110,9 @@ function Login() {
             </form>
 
             <div className="mt-6 text-center">
-                <p className="text-xs text-theme-secondary hover:text-theme-primary transition-colors cursor-pointer">
-                    Forgot password? Contact Admin.
-                </p>
+                <Link to="/forgot-password" className="text-xs text-theme-secondary hover:text-theme-primary transition-colors cursor-pointer">
+                    Forgot password?
+                </Link>
             </div>
         </div>
     );

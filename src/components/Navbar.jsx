@@ -85,7 +85,7 @@ function Navbar() {
                                     className="flex items-center space-x-2 text-theme-primary hover:text-theme-secondary focus:outline-none transition-colors px-2 py-1 rounded-md hover:bg-theme-tertiary"
                                 >
                                     <FaUserCircle size={28} className="text-theme-accent" />
-                                    <span className="font-medium text-sm">{user?.role || 'User'}</span>
+                                    <span className="font-medium text-sm">{user?.name ? user.name.split(' ')[0] : (user?.role || 'User')}</span>
                                     <FaChevronDown size={12} className={`transform transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
@@ -94,7 +94,7 @@ function Navbar() {
                                     <div className="absolute right-0 mt-2 w-48 bg-theme-secondary rounded-md shadow-lg py-1 border border-theme-color ring-1 ring-black ring-opacity-5 z-50">
                                         <div className="px-4 py-2 border-b border-theme-color">
                                             <p className="text-xs text-theme-secondary">Signed in as</p>
-                                            <p className="text-sm font-semibold text-theme-primary truncate">{user?.email || user?.role}</p>
+                                            <p className="text-sm font-semibold text-theme-primary truncate">{user?.role}</p>
                                         </div>
                                         <NavLink
                                             to="/profile"
@@ -212,8 +212,8 @@ function Navbar() {
                                     <FaUserCircle size={30} className="text-theme-accent" />
                                 </div>
                                 <div className="ml-3">
-                                    <div className="text-base font-medium text-theme-primary">{user?.role}</div>
-                                    <div className="text-sm font-medium text-theme-secondary">{user?.email}</div>
+                                    <div className="text-base font-medium text-theme-primary">{user?.name || user?.role}</div>
+                                    <div className="text-sm font-medium text-theme-secondary">Signed in as {user?.role}</div>
                                 </div>
                                 <button
                                     onClick={logout}

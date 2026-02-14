@@ -31,12 +31,37 @@ const KycPage = () => {
         }
     })
 
+    const [selectedPages, setSelectedPages] = React.useState({
+        kyc: true,
+        newConnectionDeclaration: true,
+        hotPlateInspection: true
+    });
+
+    const handlePageSelection = (page) => {
+        setSelectedPages(prev => ({
+            ...prev,
+            [page]: !prev[page]
+        }));
+    };
+
     const onSubmit = async (data) => {
+        const pagesToPrint = Object.keys(selectedPages).filter(page => selectedPages[page]);
+
+        if (pagesToPrint.length === 0) {
+            alert("Please select at least one page to print");
+            return;
+        }
+
+        const payload = {
+            ...data,
+            selectedPages: pagesToPrint
+        };
+
         try {
-            const res = await api.post("/pdf/kyc", data, { responseType: "blob" });
-            window.open(URL.createObjectURL(new Blob([res.data], {
-                type: "application/pdf"
-            })));
+            const res = await api.post("/pdf/kyc", payload, { responseType: "blob" });
+            const blob = new Blob([res.data], { type: "application/pdf" });
+            const url = window.URL.createObjectURL(blob);
+            window.open(url, '_blank');
         } catch (err) {
             console.log(err);
         }
@@ -167,7 +192,6 @@ const KycPage = () => {
                         labelText="Ration Card Number"
                         {...register("rationCardNo")}
                         error={errors.rationCardNo}
-
                     />
                     <Input
                         labelText="Document Date"
@@ -179,7 +203,36 @@ const KycPage = () => {
 
                 <hr className="w-full my-3 border-theme-color opacity-30" />
 
-                <div className="flex justify-end">
+                <div className="flex flex-col sm:flex-row justify-end items-center gap-4">
+                    <div className="flex items-center gap-4 mr-2">
+                        <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-theme-primary select-none">
+                            <input
+                                type="checkbox"
+                                checked={selectedPages.kyc}
+                                onChange={() => handlePageSelection('kyc')}
+                                className="w-4 h-4 rounded border-gray-300 text-theme-accent focus:ring-theme-accent"
+                            />
+                            KYC Page
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-theme-primary select-none">
+                            <input
+                                type="checkbox"
+                                checked={selectedPages.newConnectionDeclaration}
+                                onChange={() => handlePageSelection('newConnectionDeclaration')}
+                                className="w-4 h-4 rounded border-gray-300 text-theme-accent focus:ring-theme-accent"
+                            />
+                            New Connection Declaration
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer text-sm font-semibold text-theme-primary select-none">
+                            <input
+                                type="checkbox"
+                                checked={selectedPages.hotPlateInspection}
+                                onChange={() => handlePageSelection('hotPlateInspection')}
+                                className="w-4 h-4 rounded border-gray-300 text-theme-accent focus:ring-theme-accent"
+                            />
+                            Hot Plate Inspection Report
+                        </label>
+                    </div>
                     <button
                         className='px-6 py-2 rounded-md font-bold text-sm shadow-sm transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-1'
                         style={{ backgroundColor: 'var(--accent-color)', color: 'var(--bg-primary)' }}
