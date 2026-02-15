@@ -52,6 +52,12 @@ import SuperAdminDashboard from './pages/SuperAdminDashboard'
 import SuperAdminLogin from './pages/SuperAdminLogin'
 import PrivacyPolicy from './pages/PrivacyPolicy'
 import TermsOfService from './pages/TermsOfService'
+import InventoryDashboard from './pages/inventory/InventoryDashboard'
+import PlantPurchase from './pages/inventory/PlantPurchase'
+import EmptyDispatch from './pages/inventory/EmptyDispatch'
+import SupplierManagement from './pages/inventory/SupplierManagement'
+import ProductManagement from './pages/inventory/ProductManagement'
+import GlobalProductMaster from './pages/admin/GlobalProductMaster'
 import './app.css'
 function App() {
 
@@ -67,11 +73,20 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
+
+
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/kyc" element={<KycPage />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/inventory/dashboard" element={<InventoryDashboard />} />
+              <Route path="/inventory/products" element={<ProductManagement />} />
+              <Route path="/inventory/suppliers" element={<SupplierManagement />} />
+              <Route path="/inventory/plant-receipt" element={<PlantPurchase />} />
+              <Route path="/inventory/empty-dispatch" element={<EmptyDispatch />} />
+            </Route>
+            <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SUPER-ADMIN', 'SHOWROOM-STAFF']} />}>
+              <Route path="/kyc" element={<KycPage />} />
             </Route>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -83,6 +98,7 @@ function App() {
           <Route path="/super-admin/login" element={<SuperAdminLogin />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
+            <Route path="/super-admin/products" element={<GlobalProductMaster />} />
           </Route>
 
           <Route path="/*" element={<Navigate to="/" />} />

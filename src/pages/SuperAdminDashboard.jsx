@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt } from 'react-icons/fa';
+import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt, FaBox } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import api from '../axios/axiosInstance';
 import { useTheme } from '../context/ThemeContext';
@@ -220,9 +220,12 @@ const SuperAdminDashboard = () => {
                             <div className="bg-theme-secondary rounded-xl border border-theme-color shadow-sm p-6 flex flex-col">
                                 <h3 className="text-lg font-bold text-theme-primary mb-4">Quick Actions</h3>
                                 <div className="space-y-3 flex-1">
-                                    <button className="w-full p-3 rounded-lg border border-theme-color hover:bg-theme-tertiary text-left flex items-center justify-between group transition-colors">
-                                        <span className="text-sm font-medium text-theme-primary">Generate Monthly Report</span>
-                                        <FaChartLine className="text-theme-secondary group-hover:text-theme-accent" />
+                                    <button onClick={() => navigate('/super-admin/products')} className="w-full p-3 rounded-lg border border-theme-color hover:bg-theme-tertiary text-left flex items-center justify-between group transition-colors">
+                                        <div className="flex items-center gap-2">
+                                            <FaBox className="text-theme-secondary group-hover:text-theme-accent" />
+                                            <span className="text-sm font-medium text-theme-primary">Manage Global Products</span>
+                                        </div>
+                                        <span className="text-xs text-theme-accent opacity-0 group-hover:opacity-100 transition-opacity">Go &rarr;</span>
                                     </button>
                                     <button className="w-full p-3 rounded-lg border border-theme-color hover:bg-theme-tertiary text-left flex items-center justify-between group transition-colors">
                                         <span className="text-sm font-medium text-theme-primary">Manage Users</span>

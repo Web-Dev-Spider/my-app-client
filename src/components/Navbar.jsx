@@ -52,28 +52,74 @@ function Navbar() {
                         <NavLink to="/dashboard" className={linkClass}>Dashboard</NavLink>
 
                         {/* Documents Dropdown */}
-                        <div className="relative group">
-                            <button
-                                className="px-3 py-2 rounded-md font-medium text-sm tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary hover:shadow-sm flex items-center space-x-1 focus:outline-none transition-all duration-200"
-                            >
-                                <span>Documents</span>
-                                <FaChevronDown size={10} className="transform group-hover:rotate-180 transition-transform duration-200" />
-                            </button>
-                            <div className="absolute left-0 mt-2 w-48 bg-theme-secondary rounded-md shadow-lg py-1 border border-theme-color ring-1 ring-black ring-opacity-5 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50 transform origin-top scale-95 group-hover:scale-100">
-                                <NavLink
-                                    to="/kyc"
-                                    className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                        {user && ['ADMIN', 'SUPER-ADMIN', 'SHOWROOM-STAFF'].includes(user.role) && (
+                            <div className="relative group">
+                                <button
+                                    className="px-3 py-2 rounded-md font-medium text-sm tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary hover:shadow-sm flex items-center space-x-1 focus:outline-none transition-all duration-200"
                                 >
-                                    Create KYC
-                                </NavLink>
-                                <NavLink
-                                    to="/sv-loss"
-                                    className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
-                                >
-                                    SV Loss
-                                </NavLink>
+                                    <span>Documents</span>
+                                    <FaChevronDown size={10} className="transform group-hover:rotate-180 transition-transform duration-200" />
+                                </button>
+                                <div className="absolute left-0 mt-2 w-48 bg-theme-secondary rounded-md shadow-lg py-1 border border-theme-color ring-1 ring-black ring-opacity-5 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50 transform origin-top scale-95 group-hover:scale-100">
+                                    <NavLink
+                                        to="/kyc"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Create KYC
+                                    </NavLink>
+                                    <NavLink
+                                        to="/sv-loss"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        SV Loss
+                                    </NavLink>
+                                </div>
                             </div>
-                        </div>
+                        )}
+
+                        {/* Inventory Dropdown */}
+                        {user && ['ADMIN', 'SUPER-ADMIN', 'MANAGER', 'GODOWN-KEEPER'].includes(user.role) && (
+                            <div className="relative group">
+                                <button
+                                    className="px-3 py-2 rounded-md font-medium text-sm tracking-wide text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary hover:shadow-sm flex items-center space-x-1 focus:outline-none transition-all duration-200"
+                                >
+                                    <span>Inventory</span>
+                                    <FaChevronDown size={10} className="transform group-hover:rotate-180 transition-transform duration-200" />
+                                </button>
+                                <div className="absolute left-0 mt-2 w-48 bg-theme-secondary rounded-md shadow-lg py-1 border border-theme-color ring-1 ring-black ring-opacity-5 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50 transform origin-top scale-95 group-hover:scale-100">
+                                    <NavLink
+                                        to="/inventory/dashboard"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Live Stock
+                                    </NavLink>
+                                    <NavLink
+                                        to="/inventory/products"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Manage Products
+                                    </NavLink>
+                                    <NavLink
+                                        to="/inventory/suppliers"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Manage Suppliers
+                                    </NavLink>
+                                    <NavLink
+                                        to="/inventory/plant-receipt"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Plant Receipt
+                                    </NavLink>
+                                    <NavLink
+                                        to="/inventory/empty-dispatch"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Empty Dispatch
+                                    </NavLink>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Side: Auth / Profile */}
@@ -177,23 +223,67 @@ function Navbar() {
                         </NavLink>
 
                         {/* Mobile Documents Section */}
-                        <div className="px-3 py-2">
-                            <span className="block text-sm font-semibold text-theme-secondary mb-2 uppercase tracking-wider">Documents</span>
-                            <NavLink
-                                to="/kyc"
-                                className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                Create KYC
-                            </NavLink>
-                            <NavLink
-                                to="/sv-loss"
-                                className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
-                                onClick={() => setIsMenuOpen(false)}
-                            >
-                                SV Loss
-                            </NavLink>
-                        </div>
+                        {user && ['ADMIN', 'SUPER-ADMIN', 'SHOWROOM-STAFF'].includes(user.role) && (
+                            <div className="px-3 py-2">
+                                <span className="block text-sm font-semibold text-theme-secondary mb-2 uppercase tracking-wider">Documents</span>
+                                <NavLink
+                                    to="/kyc"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Create KYC
+                                </NavLink>
+                                <NavLink
+                                    to="/sv-loss"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    SV Loss
+                                </NavLink>
+                            </div>
+                        )}
+
+                        {/* Mobile Inventory Section */}
+                        {user && ['ADMIN', 'SUPER-ADMIN', 'MANAGER', 'GODOWN-KEEPER'].includes(user.role) && (
+                            <div className="px-3 py-2">
+                                <span className="block text-sm font-semibold text-theme-secondary mb-2 uppercase tracking-wider">Inventory</span>
+                                <NavLink
+                                    to="/inventory/dashboard"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Live Stock
+                                </NavLink>
+                                <NavLink
+                                    to="/inventory/products"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Manage Products
+                                </NavLink>
+                                <NavLink
+                                    to="/inventory/suppliers"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Manage Suppliers
+                                </NavLink>
+                                <NavLink
+                                    to="/inventory/plant-receipt"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Plant Receipt
+                                </NavLink>
+                                <NavLink
+                                    to="/inventory/empty-dispatch"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Empty Dispatch
+                                </NavLink>
+                            </div>
+                        )}
 
                         <NavLink
                             to="/settings"

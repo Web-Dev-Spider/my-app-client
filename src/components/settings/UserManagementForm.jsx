@@ -102,42 +102,49 @@ const UserManagementForm = () => {
     };
 
     const handleToggleStatus = async (user) => {
-        // Show loading state for action
-        setLoading(true);
+        // Optimistic update to prevent partial UI lag/flicker
+        const originalUsers = [...users];
+        setUsers(prev => prev.map(u => u._id === user._id ? { ...u, isActive: !user.isActive } : u));
+
         try {
             const res = await api.put(`/admin/user/${user._id}/status`, { isActive: !user.isActive });
             if (res.data.success) {
                 setMessage({ type: 'success', text: `User ${!user.isActive ? 'activated' : 'deactivated'} successfully` });
-                // Reload data to ensure stats are synced
+                // Background sync to update stats
                 await fetchUsersAndStats(true);
 
-                // Clear success message after 3 seconds
                 setTimeout(() => {
                     setMessage({ type: '', text: '' });
                 }, 3000);
+            } else {
+                setUsers(originalUsers); // Revert on failure
             }
         } catch (error) {
             console.error("Error toggling status:", error);
             setMessage({ type: 'error', text: 'Error updating status' });
-        } finally {
-            setLoading(false);
+            setUsers(originalUsers); // Revert on error
         }
     };
 
     const handleDeleteClick = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
-        setLoading(true);
+
+        // Optimistic update for delete
+        const originalUsers = [...users];
+        setUsers(prev => prev.filter(u => u._id !== userId));
+
         try {
             const res = await api.delete(`/admin/user/${userId}`);
             if (res.data.success) {
                 setMessage({ type: 'success', text: 'User deleted successfully' });
                 await fetchUsersAndStats(true);
+            } else {
+                setUsers(originalUsers);
             }
         } catch (error) {
             console.error("Error deleting user:", error);
             setMessage({ type: 'error', text: 'Error deleting user' });
-        } finally {
-            setLoading(false);
+            setUsers(originalUsers);
         }
     };
 
