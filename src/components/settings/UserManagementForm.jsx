@@ -55,8 +55,8 @@ const UserManagementForm = () => {
         }
     }, [view]);
 
-    const fetchUsersAndStats = async () => {
-        setLoading(true);
+    const fetchUsersAndStats = async (isBackground = false) => {
+        if (!isBackground) setLoading(true);
         try {
             const [usersRes, statsRes] = await Promise.all([
                 api.get('/admin/users'),
@@ -73,7 +73,7 @@ const UserManagementForm = () => {
             console.error("Error fetching data:", error);
             setMessage({ type: 'error', text: 'Error fetching data' });
         } finally {
-            setLoading(false);
+            if (!isBackground) setLoading(false);
         }
     };
 
@@ -102,12 +102,14 @@ const UserManagementForm = () => {
     };
 
     const handleToggleStatus = async (user) => {
+        // Show loading state for action
+        setLoading(true);
         try {
             const res = await api.put(`/admin/user/${user._id}/status`, { isActive: !user.isActive });
             if (res.data.success) {
-                // Optimistically update UI
-                setUsers(prev => prev.map(u => u._id === user._id ? { ...u, isActive: !user.isActive } : u));
                 setMessage({ type: 'success', text: `User ${!user.isActive ? 'activated' : 'deactivated'} successfully` });
+                // Reload data to ensure stats are synced
+                await fetchUsersAndStats(true);
 
                 // Clear success message after 3 seconds
                 setTimeout(() => {
@@ -117,21 +119,25 @@ const UserManagementForm = () => {
         } catch (error) {
             console.error("Error toggling status:", error);
             setMessage({ type: 'error', text: 'Error updating status' });
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleDeleteClick = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
-
+        setLoading(true);
         try {
             const res = await api.delete(`/admin/user/${userId}`);
             if (res.data.success) {
                 setMessage({ type: 'success', text: 'User deleted successfully' });
-                fetchUsersAndStats();
+                await fetchUsersAndStats(true);
             }
         } catch (error) {
             console.error("Error deleting user:", error);
             setMessage({ type: 'error', text: 'Error deleting user' });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -160,13 +166,12 @@ const UserManagementForm = () => {
             if (view === 'create') {
                 res = await api.post('/admin/create-user', formData);
             } else if (view === 'edit') {
-                // Determine if any data was actually changed to avoid unnecessary updates if needed, 
-                // but for now we send all (backend handles partial updates for some fields, but we are sending full object structure)
                 res = await api.put(`/admin/user/${editingUser._id}`, formData);
             }
 
             if (res.data.success) {
                 setMessage({ type: 'success', text: `User ${view === 'create' ? 'created' : 'updated'} successfully` });
+                await fetchUsersAndStats(true); // Refresh data
                 setTimeout(() => {
                     setView('list');
                     setMessage({ type: '', text: '' });
@@ -196,6 +201,25 @@ const UserManagementForm = () => {
         : staffUsers;
 
     if (view === 'list') {
+        // Fallback Loading Screen
+        if (loading && users.length === 0) {
+            return (
+                <div className="space-y-6 animate-pulse p-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="h-24 bg-slate-200 rounded-xl"></div>
+                        ))}
+                    </div>
+                    <div className="h-10 w-1/4 bg-slate-200 rounded"></div>
+                    <div className="space-y-4">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="h-16 bg-slate-100 rounded-xl"></div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
         return (
             <div className="space-y-6 animate-fadeIn">
                 {/* Dashboard Stats */}
@@ -208,6 +232,7 @@ const UserManagementForm = () => {
                             : 'bg-theme-accent/10 border-theme-accent/30 hover:bg-theme-accent/20'
                             }`}
                     >
+
                         <h5 className={`text-xs uppercase font-semibold mb-2 ${selectedRole === null ? 'text-white/90' : 'text-theme-accent'}`}>Total Staffs</h5>
                         <div className="flex justify-between items-end">
                             <span className={`text-2xl font-bold ${selectedRole === null ? 'text-white' : 'text-theme-accent'}`}>{totalStats.total}</span>
@@ -216,35 +241,37 @@ const UserManagementForm = () => {
                                 <div><span className="font-medium">{totalStats.inactive}</span> Inactive</div>
                             </div>
                         </div>
-                    </div>
+                    </div >
 
-                    {roles.map(role => {
-                        const roleStats = stats[role] || { total: 0, active: 0, inactive: 0 };
-                        const isSelected = selectedRole === role;
+                    {
+                        roles.map(role => {
+                            const roleStats = stats[role] || { total: 0, active: 0, inactive: 0 };
+                            const isSelected = selectedRole === role;
 
-                        return (
-                            <div
-                                key={role}
-                                onClick={() => setSelectedRole(role)}
-                                className={`p-4 rounded-xl border shadow-sm cursor-pointer transition-all ${isSelected
-                                    ? 'bg-blue-100 border-blue-300 ring-2 ring-blue-300/50'
-                                    : 'bg-theme-secondary border-theme-color hover:bg-theme-tertiary'
-                                    }`}
-                            >
-                                <h5 className={`text-xs uppercase font-bold mb-2 truncate ${isSelected ? 'text-blue-900' : 'text-theme-secondary'}`} title={role.replace(/-/g, ' ')}>
-                                    {role.replace(/-/g, ' ')}
-                                </h5>
-                                <div className="flex justify-between items-end">
-                                    <span className={`text-2xl font-bold ${isSelected ? 'text-blue-900' : 'text-theme-primary'}`}>{roleStats.total}</span>
-                                    <div className={`text-xs text-left ${isSelected ? 'text-blue-800' : 'text-theme-secondary'}`}>
-                                        <div className={isSelected ? "text-blue-900" : "text-green-600"}><span className="font-semibold">{roleStats.active}</span> Active</div>
-                                        <div className={isSelected ? "text-blue-900" : "text-red-600"}><span className="font-semibold">{roleStats.inactive}</span> Inactive</div>
+                            return (
+                                <div
+                                    key={role}
+                                    onClick={() => setSelectedRole(role)}
+                                    className={`p-4 rounded-xl border shadow-sm cursor-pointer transition-all ${isSelected
+                                        ? 'bg-blue-100 border-blue-300 ring-2 ring-blue-300/50'
+                                        : 'bg-theme-secondary border-theme-color hover:bg-theme-tertiary'
+                                        }`}
+                                >
+                                    <h5 className={`text-xs uppercase font-bold mb-2 truncate ${isSelected ? 'text-blue-900' : 'text-theme-secondary'}`} title={role.replace(/-/g, ' ')}>
+                                        {role.replace(/-/g, ' ')}
+                                    </h5>
+                                    <div className="flex justify-between items-end">
+                                        <span className={`text-2xl font-bold ${isSelected ? 'text-blue-900' : 'text-theme-primary'}`}>{roleStats.total}</span>
+                                        <div className={`text-xs text-left ${isSelected ? 'text-blue-800' : 'text-theme-secondary'}`}>
+                                            <div className={isSelected ? "text-blue-900" : "text-green-600"}><span className="font-semibold">{roleStats.active}</span> Active</div>
+                                            <div className={isSelected ? "text-blue-900" : "text-red-600"}><span className="font-semibold">{roleStats.inactive}</span> Inactive</div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })
+                    }
+                </div >
 
                 <div className="flex justify-between items-center pt-2">
                     <h3 className="text-lg font-bold text-theme-primary">
@@ -258,11 +285,13 @@ const UserManagementForm = () => {
                     </button>
                 </div>
 
-                {message.text && (
-                    <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {message.text}
-                    </div>
-                )}
+                {
+                    message.text && (
+                        <div className={`p-3 rounded-md text-sm ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            {message.text}
+                        </div>
+                    )
+                }
 
                 <div className="bg-theme-secondary rounded-xl border border-theme-color overflow-hidden">
                     <div className="overflow-x-auto">
@@ -330,7 +359,7 @@ const UserManagementForm = () => {
                         </table>
                     </div>
                 </div>
-            </div>
+            </div >
         );
     }
 
