@@ -41,7 +41,7 @@ const Welcome = () => {
         <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
 
             {/* 1. Hero Section */}
-            <section className="relative px-6 py-18 flex flex-col items-center text-center bg-gradient-to-b from-blue-50/70 via-white to-white border-b border-slate-200">
+            <section className="relative px-6 py-15 flex flex-col items-center text-center bg-gradient-to-b from-blue-50/70 via-white to-white border-b border-slate-200">
                 <div className="max-w-5xl mx-auto space-y-10 animate-fadeIn">
                     <span className="inline-block py-2 px-4 rounded-full bg-blue-100 text-blue-800 text-sm font-bold tracking-wide shadow-sm">
                         We invite you to join us in this journey
