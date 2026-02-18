@@ -23,10 +23,9 @@ const ProductManagement = () => {
         taxRate: '',
         currentPurchasePrice: '',
         currentSalePrice: '',
-        securityDepositPrice: '', // New field
-        openingStockFilled: '', // New field
-        openingStockEmpty: '', // New field
-        openingStockDefective: '', // New field
+        securityDepositPrice: '',
+        variant: 'Filled', // For cylinders: Filled, Empty, or Defective
+        openingStock: '', // Simplified to single field since each variant is separate
         priceEffectiveDate: ''
     });
 
@@ -62,53 +61,59 @@ const ProductManagement = () => {
 
     // Filter products based on active tab, search term, and category filter
     const filteredProducts = products.filter(p => {
-        // Normalize type check: if activeTab is cylinder, look for cylinder. If NFR, look for item OR nfr. If PR, look for PR.
         const normalizeType = (t) => t === 'cylinder' ? 'cylinder' : (t === 'pr' ? 'pr' : 'nfr');
         const productType = normalizeType(p.type);
         const currentTabType = normalizeType(activeTab);
 
         const matchesTab = productType === currentTabType;
         const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (p.productCode && p.productCode.toLowerCase().includes(searchTerm.toLowerCase()));
+            (p.productCode && p.productCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (p.itemCode && p.itemCode.toLowerCase().includes(searchTerm.toLowerCase()));
 
         let matchesCategory = true;
         if (filterCategory) {
             if (filterCategory === 'Fiber') {
                 matchesCategory = p.isFiber;
+            } else if (p.type === 'nfr') {
+                // For NFR, filterCategory could be a subcategory
+                // Check if it matches subcategory, or fall back to category if broad
+                matchesCategory = (p.subcategory === filterCategory) ||
+                    (p.category && p.category.toLowerCase() === filterCategory.toLowerCase());
             } else {
-                // Approximate match for PR categories if needed, or exact
-                matchesCategory = p.category && p.category.toLowerCase().includes(filterCategory.toLowerCase());
+                matchesCategory = p.category && p.category.toLowerCase() === filterCategory.toLowerCase();
             }
         }
 
         return matchesTab && matchesSearch && matchesCategory;
     });
 
-    // Counts
+    // Counts (case-insensitive category matching)
+    const catMatch = (p, cat) => p.category && p.category.toLowerCase() === cat.toLowerCase();
+
     const cylinderCounts = {
         total: products.filter(p => p.type === 'cylinder').length,
-        domestic: products.filter(p => p.type === 'cylinder' && p.category === 'domestic').length,
-        commercial: products.filter(p => p.type === 'cylinder' && p.category === 'commercial').length,
-        ftl: products.filter(p => p.type === 'cylinder' && p.category === 'ftl').length,
+        domestic: products.filter(p => p.type === 'cylinder' && catMatch(p, 'Domestic')).length,
+        commercial: products.filter(p => p.type === 'cylinder' && catMatch(p, 'Commercial')).length,
+        ftl: products.filter(p => p.type === 'cylinder' && catMatch(p, 'FTL')).length,
         fiber: products.filter(p => p.type === 'cylinder' && p.isFiber).length
     };
 
     const nfrCounts = {
         total: products.filter(p => p.type === 'nfr').length,
-        hose: products.filter(p => p.type === 'nfr' && p.category === 'Suraksha Hose').length,
-        stove: products.filter(p => p.type === 'nfr' && p.category === 'LPG Stove').length,
-        lighter: products.filter(p => p.type === 'nfr' && p.category === 'Lighter').length,
-        apron: products.filter(p => p.type === 'nfr' && p.category === 'Apron').length,
-        trolley: products.filter(p => p.type === 'nfr' && p.category === 'Trolley').length,
-        fireBall: products.filter(p => p.type === 'nfr' && p.category === 'Fire Ball').length,
-        other: products.filter(p => p.type === 'nfr' && (!p.category || p.category === 'Other')).length
+        hose: products.filter(p => p.type === 'nfr' && p.subcategory === 'Suraksha Hose').length,
+        stove: products.filter(p => p.type === 'nfr' && p.subcategory === 'LPG Stove').length,
+        lighter: products.filter(p => p.type === 'nfr' && p.subcategory === 'Lighter').length,
+        apron: products.filter(p => p.type === 'nfr' && p.subcategory === 'Apron').length,
+        trolley: products.filter(p => p.type === 'nfr' && p.subcategory === 'Trolley').length,
+        fireBall: products.filter(p => p.type === 'nfr' && p.subcategory === 'Fire Ball').length,
+        other: products.filter(p => p.type === 'nfr' && (!p.subcategory || p.subcategory === 'Other')).length
     };
 
     const prCounts = {
         total: products.filter(p => p.type === 'pr').length,
-        domestic: products.filter(p => p.type === 'pr' && p.category && p.category.toLowerCase().includes('domestic')).length,
-        ftl: products.filter(p => p.type === 'pr' && p.category === 'FTL PR').length,
-        resell: products.filter(p => p.type === 'pr' && p.category === 'FTL POS Resell PR').length
+        domestic: products.filter(p => p.type === 'pr' && catMatch(p, 'Domestic')).length,
+        commercial: products.filter(p => p.type === 'pr' && catMatch(p, 'Commercial')).length,
+        ftl: products.filter(p => p.type === 'pr' && catMatch(p, 'FTL')).length
     };
 
     const handleInputChange = (e) => {
@@ -134,7 +139,9 @@ const ProductManagement = () => {
                 taxRate: product.taxRate || '',
                 currentPurchasePrice: product.currentPurchasePrice || '',
                 currentSalePrice: product.currentSalePrice || '',
-                priceEffectiveDate: product.priceEffectiveDate ? new Date(product.priceEffectiveDate).toISOString().split('T')[0] : ''
+                priceEffectiveDate: product.priceEffectiveDate ? new Date(product.priceEffectiveDate).toISOString().split('T')[0] : '',
+                variant: product.variant || 'Filled',
+                openingStock: product.openingStock || ''
             });
         } else {
             setEditingProduct(null);
@@ -150,7 +157,9 @@ const ProductManagement = () => {
                 taxRate: '',
                 currentPurchasePrice: '',
                 currentSalePrice: '',
-                priceEffectiveDate: ''
+                priceEffectiveDate: '',
+                variant: 'Filled',
+                openingStock: ''
             });
         }
         setIsModalOpen(true);
@@ -218,7 +227,10 @@ const ProductManagement = () => {
         salePrice: '',
         openingStockFilled: '',
         openingStockEmpty: '',
-        openingStockDefective: ''
+        openingStockDefective: '',
+        openingStockSound: '',
+        openingStockDefectivePR: '',
+        openingStockQuantity: ''
     });
 
     const fetchUnmappedProducts = async () => {
@@ -237,10 +249,17 @@ const ProductManagement = () => {
         setSelectedGlobalForMap(product);
         setMapConfig({
             purchasePrice: '',
-            salePrice: product.productType === 'PR' && product.category && product.category.includes('Domestic') ? 0 : '',
+            salePrice: product.productType === 'PR' && product.category === 'Domestic' ? 0 : '',
             openingStockFilled: '',
             openingStockEmpty: '',
-            openingStockDefective: ''
+            openingStockDefective: '',
+            openingStockSound: '',
+            openingStockDefectivePR: '',
+            openingStockQuantity: '',
+            // NFR-specific
+            localName: product.name || '',
+            itemCode: product.productCode || '',
+            priceEffectiveDate: new Date().toISOString().split('T')[0]
         });
         setShowGlobalModal(false);
     };
@@ -252,9 +271,20 @@ const ProductManagement = () => {
                 globalProductId: selectedGlobalForMap._id,
                 currentPurchasePrice: mapConfig.purchasePrice,
                 currentSalePrice: mapConfig.salePrice,
+                // Cylinder fields
                 openingStockFilled: mapConfig.openingStockFilled,
                 openingStockEmpty: mapConfig.openingStockEmpty,
-                openingStockDefective: mapConfig.openingStockDefective
+                openingStockDefective: mapConfig.openingStockDefective,
+                // PR fields
+                openingStockSound: mapConfig.openingStockSound,
+                openingStockDefectivePR: mapConfig.openingStockDefectivePR,
+                // NFR field (reuse openingStockFilled for quantity)
+                ...(selectedGlobalForMap.productType === 'NFR' && {
+                    openingStockFilled: mapConfig.openingStockQuantity,
+                    localName: mapConfig.localName,
+                    itemCode: mapConfig.itemCode,
+                    priceEffectiveDate: mapConfig.priceEffectiveDate
+                })
             });
             if (res.data.success) {
                 setMessage({ text: 'Product added successfully', type: 'success' });
@@ -305,24 +335,23 @@ const ProductManagement = () => {
                     <h3 className="text-[10px] font-bold text-theme-secondary opacity-70 uppercase tracking-widest mb-2 pl-1">Cylinders Overview</h3>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                         {renderDashboardCard('All Cylinders', cylinderCounts.total, null, 'cylinder')}
-                        {renderDashboardCard('Domestic', cylinderCounts.domestic, 'domestic', 'cylinder')}
-                        {renderDashboardCard('Commercial', cylinderCounts.commercial, 'commercial', 'cylinder')}
-                        {renderDashboardCard('FTL', cylinderCounts.ftl, 'ftl', 'cylinder')}
+                        {renderDashboardCard('Domestic', cylinderCounts.domestic, 'Domestic', 'cylinder')}
+                        {renderDashboardCard('Commercial', cylinderCounts.commercial, 'Commercial', 'cylinder')}
+                        {renderDashboardCard('FTL', cylinderCounts.ftl, 'FTL', 'cylinder')}
                         {renderDashboardCard('Fiber', cylinderCounts.fiber, 'Fiber', 'cylinder')}
                     </div>
                 </div>
 
                 <div>
                     <h3 className="text-[10px] font-bold text-theme-secondary opacity-70 uppercase tracking-widest mb-2 pl-1">NFR Products Overview</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
                         {renderDashboardCard('All NFR', nfrCounts.total, null, 'nfr')}
-                        {renderDashboardCard('Hoses', nfrCounts.hose, 'Suraksha Hose', 'nfr')}
-                        {renderDashboardCard('Stoves', nfrCounts.stove, 'LPG Stove', 'nfr')}
-                        {renderDashboardCard('Lighters', nfrCounts.lighter, 'Lighter', 'nfr')}
-                        {renderDashboardCard('Aprons', nfrCounts.apron, 'Apron', 'nfr')}
-                        {renderDashboardCard('Trolleys', nfrCounts.trolley, 'Trolley', 'nfr')}
-                        {renderDashboardCard('Fire Balls', nfrCounts.fireBall, 'Fire Ball', 'nfr')}
-                        {renderDashboardCard('Other', nfrCounts.other, 'Other', 'nfr')}
+                        {renderDashboardCard('Hose', nfrCounts.hose, 'Suraksha Hose', 'nfr')}
+                        {renderDashboardCard('Stove', nfrCounts.stove, 'LPG Stove', 'nfr')}
+                        {renderDashboardCard('Lighter', nfrCounts.lighter, 'Lighter', 'nfr')}
+                        {renderDashboardCard('Apron', nfrCounts.apron, 'Apron', 'nfr')}
+                        {renderDashboardCard('Trolley', nfrCounts.trolley, 'Trolley', 'nfr')}
+                        {renderDashboardCard('Fire Ball', nfrCounts.fireBall, 'Fire Ball', 'nfr')}
                     </div>
                 </div>
 
@@ -330,9 +359,9 @@ const ProductManagement = () => {
                     <h3 className="text-[10px] font-bold text-theme-secondary opacity-70 uppercase tracking-widest mb-2 pl-1">Pressure Regulators (PR)</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                         {renderDashboardCard('All PR', prCounts.total, null, 'pr')}
-                        {renderDashboardCard('Domestic', prCounts.domestic, 'domestic', 'pr')}
-                        {renderDashboardCard('FTL PR', prCounts.ftl, 'FTL PR', 'pr')}
-                        {renderDashboardCard('Resell PR', prCounts.resell, 'FTL POS Resell PR', 'pr')}
+                        {renderDashboardCard('Domestic', prCounts.domestic, 'Domestic', 'pr')}
+                        {renderDashboardCard('Commercial', prCounts.commercial, 'Commercial', 'pr')}
+                        {renderDashboardCard('FTL', prCounts.ftl, 'FTL', 'pr')}
                     </div>
                 </div>
             </div>
@@ -379,8 +408,8 @@ const ProductManagement = () => {
                         <thead className="bg-theme-tertiary text-theme-secondary font-medium border-b border-theme-color">
                             <tr>
                                 <th className="px-4 py-3">Product Name</th>
-                                <th className="px-4 py-3">Code</th>
-                                <th className="px-4 py-3">{activeTab === 'cylinder' ? 'Info' : 'Unit'}</th>
+                                <th className="px-4 py-3">Item Code</th>
+                                <th className="px-4 py-3">{activeTab === 'cylinder' ? 'Info' : activeTab === 'pr' ? 'Stock' : 'Unit'}</th>
                                 <th className="px-4 py-3 text-right">Purchase Price</th>
                                 <th className="px-4 py-3 text-right">Sale Price</th>
                                 <th className="px-4 py-3 text-center">Tax %</th>
@@ -406,7 +435,7 @@ const ProductManagement = () => {
                                             {product.name}
                                             {product.isGlobal && <span className="ml-2 text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded border border-blue-100">Global</span>}
                                         </td>
-                                        <td className="px-4 py-3 text-theme-secondary font-mono text-xs">{product.productCode || '-'}</td>
+                                        <td className="px-4 py-3 text-theme-secondary font-mono text-xs">{product.itemCode || product.productCode || '-'}</td>
                                         <td className="px-4 py-3 text-theme-secondary">
                                             {product.type === 'cylinder' ? (
                                                 <>
@@ -418,8 +447,28 @@ const ProductManagement = () => {
                                                         <span className="text-theme-secondary/70">Category:</span>
                                                         <span className="capitalize text-theme-primary">{product.category}</span>
                                                     </div>
+                                                    {product.stock && (
+                                                        <div className="flex gap-2 mt-0.5">
+                                                            <span className="text-[10px] bg-green-50 text-green-700 px-1.5 py-0.5 rounded">F:{product.stock.filled || 0}</span>
+                                                            <span className="text-[10px] bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded">E:{product.stock.empty || 0}</span>
+                                                            <span className="text-[10px] bg-red-50 text-red-700 px-1.5 py-0.5 rounded">D:{product.stock.defective || 0}</span>
+                                                        </div>
+                                                    )}
                                                     {product.isFiber && (
                                                         <div className="text-orange-500 font-medium text-[10px] uppercase">Fiber Composite</div>
+                                                    )}
+                                                </>
+                                            ) : product.type === 'pr' ? (
+                                                <>
+                                                    <div className="flex justify-between">
+                                                        <span className="text-theme-secondary/70">Category:</span>
+                                                        <span className="font-medium text-theme-primary">{product.category || '-'}</span>
+                                                    </div>
+                                                    {product.stock && (
+                                                        <div className="flex gap-2 mt-0.5">
+                                                            <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">Sound:{product.stock.sound || 0}</span>
+                                                            <span className="text-[10px] bg-red-50 text-red-700 px-1.5 py-0.5 rounded">Def:{product.stock.defectivePR || 0}</span>
+                                                        </div>
                                                     )}
                                                 </>
                                             ) : (
@@ -432,6 +481,11 @@ const ProductManagement = () => {
                                                         <span className="text-theme-secondary/70">Unit:</span>
                                                         <span className="text-theme-primary">{product.unit}</span>
                                                     </div>
+                                                    {product.stock && (
+                                                        <div className="flex gap-2 mt-0.5">
+                                                            <span className="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded">Qty:{product.stock.quantity || 0}</span>
+                                                        </div>
+                                                    )}
                                                 </>
                                             )}
                                         </td>
@@ -535,6 +589,16 @@ const ProductManagement = () => {
                                         Is Fiber Cylinder?
                                     </label>
 
+                                    {/* Variant Selector */}
+                                    <div className="col-span-2">
+                                        <label className="block text-[10px] font-medium text-theme-secondary mb-0.5">Stock Variant *</label>
+                                        <select name="variant" value={formData.variant} onChange={handleInputChange} className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent">
+                                            <option value="Filled">Filled</option>
+                                            <option value="Empty">Empty</option>
+                                            <option value="Defective">Defective</option>
+                                        </select>
+                                    </div>
+
                                     {formData.category !== 'ftl' && (
                                         <div className="col-span-2">
                                             <label className="block text-[10px] font-medium text-theme-secondary mb-0.5">Security Deposit (₹)</label>
@@ -542,25 +606,20 @@ const ProductManagement = () => {
                                         </div>
                                     )}
 
-                                    {!editingProduct && (
-                                        <div className="col-span-2 mt-2 p-2 bg-theme-tertiary/50 rounded border border-theme-color/50">
-                                            <label className="block text-[10px] font-bold text-theme-primary mb-1.5 border-b border-theme-color pb-0.5">Opening Stock (Initial Inventory)</label>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                <div>
-                                                    <label className="block text-[9px] text-theme-secondary mb-0.5">Filled</label>
-                                                    <input type="number" name="openingStockFilled" value={formData.openingStockFilled} onChange={handleInputChange} className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent" placeholder="0" />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[9px] text-theme-secondary mb-0.5">Empty</label>
-                                                    <input type="number" name="openingStockEmpty" value={formData.openingStockEmpty} onChange={handleInputChange} className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent" placeholder="0" />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
-                                                    <input type="number" name="openingStockDefective" value={formData.openingStockDefective} onChange={handleInputChange} className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent" placeholder="0" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                                    {/* Opening Stock for Selected Variant */}
+                                    <div className="col-span-2 mt-2 p-2 bg-theme-tertiary/50 rounded border border-theme-color/50">
+                                        <label className="block text-[10px] font-bold text-theme-primary mb-1.5 border-b border-theme-color pb-0.5">
+                                            Opening Stock ({formData.variant})
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="openingStock"
+                                            value={formData.openingStock}
+                                            onChange={handleInputChange}
+                                            className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                            placeholder={`Enter initial ${formData.variant.toLowerCase()} stock quantity`}
+                                        />
+                                    </div>
                                 </div>
                             )}
 
@@ -749,41 +808,121 @@ const ProductManagement = () => {
                                 </div>
                             </div>
 
-                            {/* Opening Stock Section */}
+                            {/* Opening Stock Section — adapts to product type */}
                             <div className="p-2 bg-theme-tertiary/50 rounded border border-theme-color/50">
-                                <label className="block text-[10px] font-bold text-theme-primary mb-1.5 border-b border-theme-color pb-0.5">Opening Stock</label>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div>
-                                        <label className="block text-[9px] text-theme-secondary mb-0.5">Filled</label>
-                                        <input
-                                            type="number"
-                                            value={mapConfig.openingStockFilled}
-                                            onChange={(e) => setMapConfig({ ...mapConfig, openingStockFilled: e.target.value })}
-                                            className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                            placeholder="0"
-                                        />
+                                <label className="block text-[10px] font-bold text-theme-primary mb-1.5 border-b border-theme-color pb-0.5">
+                                    Opening Stock
+                                    <span className="font-normal text-theme-secondary ml-1">({selectedGlobalForMap.productType})</span>
+                                </label>
+
+                                {/* CYLINDER: Filled / Empty / Defective */}
+                                {selectedGlobalForMap.productType === 'CYLINDER' && (
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <div>
+                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Filled</label>
+                                            <input
+                                                type="number"
+                                                value={mapConfig.openingStockFilled}
+                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockFilled: e.target.value })}
+                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                placeholder="0"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Empty</label>
+                                            <input
+                                                type="number"
+                                                value={mapConfig.openingStockEmpty}
+                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockEmpty: e.target.value })}
+                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                placeholder="0"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
+                                            <input
+                                                type="number"
+                                                value={mapConfig.openingStockDefective}
+                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockDefective: e.target.value })}
+                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                placeholder="0"
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-[9px] text-theme-secondary mb-0.5">Empty</label>
-                                        <input
-                                            type="number"
-                                            value={mapConfig.openingStockEmpty}
-                                            onChange={(e) => setMapConfig({ ...mapConfig, openingStockEmpty: e.target.value })}
-                                            className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                            placeholder="0"
-                                        />
+                                )}
+
+                                {/* PR: Sound / Defective */}
+                                {selectedGlobalForMap.productType === 'PR' && (
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Sound</label>
+                                            <input
+                                                type="number"
+                                                value={mapConfig.openingStockSound}
+                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockSound: e.target.value })}
+                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                placeholder="0"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
+                                            <input
+                                                type="number"
+                                                value={mapConfig.openingStockDefectivePR}
+                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockDefectivePR: e.target.value })}
+                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                placeholder="0"
+                                            />
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
-                                        <input
-                                            type="number"
-                                            value={mapConfig.openingStockDefective}
-                                            onChange={(e) => setMapConfig({ ...mapConfig, openingStockDefective: e.target.value })}
-                                            className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                            placeholder="0"
-                                        />
+                                )}
+
+                                {/* NFR: localName, itemCode, priceEffectiveDate + Quantity */}
+                                {selectedGlobalForMap.productType === 'NFR' && (
+                                    <div className="space-y-2">
+                                        <div>
+                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Local Name</label>
+                                            <input
+                                                type="text"
+                                                value={mapConfig.localName}
+                                                onChange={(e) => setMapConfig({ ...mapConfig, localName: e.target.value })}
+                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                placeholder="Product display name"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Item Code</label>
+                                                <input
+                                                    type="text"
+                                                    value={mapConfig.itemCode}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, itemCode: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent font-mono"
+                                                    placeholder="ITEM001"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Price Effective Date</label>
+                                                <input
+                                                    type="date"
+                                                    value={mapConfig.priceEffectiveDate}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, priceEffectiveDate: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Opening Quantity</label>
+                                            <input
+                                                type="number"
+                                                value={mapConfig.openingStockQuantity}
+                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockQuantity: e.target.value })}
+                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                placeholder="0"
+                                            />
+                                        </div>
                                     </div>
-                                </div>
+                                )}
                             </div>
 
                             <div className="flex justify-end gap-2 pt-2">
