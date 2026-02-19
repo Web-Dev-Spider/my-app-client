@@ -1,68 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import api from '../axios/axiosInstance';
+import React, { useState } from 'react';
 import { FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaSearch } from 'react-icons/fa';
 
-const AgencyManagement = () => {
-    const [agencies, setAgencies] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const AgencyManagement = ({ agencies = [], filter = { company: 'ALL', status: 'ALL' }, onToggleStatus }) => {
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        fetchAgencies();
-    }, []);
+    const filteredAgencies = agencies.filter(agency => {
+        const matchesSearch = agency.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            agency.sapcode?.includes(searchTerm) ||
+            agency.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const fetchAgencies = async () => {
-        try {
-            setLoading(true);
-            const res = await api.get('/admin/agencies');
-            if (res.data.success) {
-                setAgencies(res.data.agencies);
-            } else {
-                setError("Failed to fetch agencies");
-            }
-        } catch (err) {
-            console.error(err);
-            setError("Error loading agencies data");
-        } finally {
-            setLoading(false);
-        }
-    };
+        const matchesCompany = filter.company === 'ALL' || agency.company === filter.company;
 
-    const handleToggleStatus = async (id, currentStatus) => {
-        try {
-            // Optimistic update
-            setAgencies(prev => prev.map(agency =>
-                agency._id === id ? { ...agency, isActive: !currentStatus } : agency
-            ));
+        const matchesStatus =
+            filter.status === 'ALL' ? true :
+                filter.status === 'ACTIVE' ? agency.isActive :
+                    filter.status === 'INACTIVE' ? !agency.isActive : true;
 
-            const res = await api.put(`/admin/agency/${id}/status`, { isActive: !currentStatus });
-
-            if (!res.data.success) {
-                // Revert on failure
-                setAgencies(prev => prev.map(agency =>
-                    agency._id === id ? { ...agency, isActive: currentStatus } : agency
-                ));
-                alert("Failed to update status");
-            }
-        } catch (err) {
-            console.error(err);
-            // Revert on error
-            setAgencies(prev => prev.map(agency =>
-                agency._id === id ? { ...agency, isActive: currentStatus } : agency
-            ));
-            alert("Error updating status");
-        }
-    };
-
-    const filteredAgencies = agencies.filter(agency =>
-        agency.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        agency.sapcode?.includes(searchTerm) ||
-        agency.email.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (loading) return <div className="p-4 text-center text-theme-secondary">Loading agencies...</div>;
-    if (error) return <div className="p-4 text-center text-red-500">{error}</div>;
+        return matchesSearch && matchesCompany && matchesStatus;
+    });
 
     return (
         <div className="bg-theme-secondary rounded-xl border border-theme-color shadow-sm overflow-hidden">
@@ -120,7 +75,7 @@ const AgencyManagement = () => {
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <button
-                                            onClick={() => handleToggleStatus(agency._id, agency.isActive)}
+                                            onClick={() => onToggleStatus(agency._id, agency.isActive)}
                                             className={`px-3 py-1 rounded-md text-xs font-medium border transition-colors
                                                 ${agency.isActive
                                                     ? 'border-red-200 text-red-600 hover:bg-red-50'

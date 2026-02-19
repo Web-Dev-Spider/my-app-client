@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { FaBuilding, FaIdBadge, FaEnvelope, FaLock } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'
-import api from '../axios/axiosInstance'
+import api from '../../axios/axiosInstance'
 
 function Register() {
 

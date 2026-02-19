@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../axios/axiosInstance";
+import api from "../../axios/axiosInstance";
 
 function ResetPassword() {
     const { token } = useParams();
