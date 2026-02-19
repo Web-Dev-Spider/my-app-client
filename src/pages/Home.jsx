@@ -8,7 +8,7 @@ function Home() {
 
     return (
         <div className="p-10 text-center">
-            <h2 className='text-gray-700 text-3xl my-4'>{user?.name ? `Welcome, ${(user?.name)}` : 'back!!!'}</h2>
+            <h2 className='text-gray-700 text-3xl my-4'> Welcome, {user?.name ? `${(user?.name)}` : 'back!!!'}</h2>
             <h2 className='text-gray-700 text-2xl my-4'>You are logged in as {user?.role}</h2>
             <p className="text-gray-600 text-4xl">Let's try to simplify things</p>
 
