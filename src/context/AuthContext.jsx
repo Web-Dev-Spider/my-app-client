@@ -53,6 +53,8 @@ export const AuthProvider = ({ children }) => {
 
     // Login function
     const login = async (identifier, password) => {
+        // console.log("identifier", identifier)
+        // console.log("password", password)
         try {
             const res = await api.post("/auth/login", { identifier, password }, {
                 withCredentials: true
@@ -86,7 +88,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout, loading, agency, setIsAuthenticated, setUser, setAgency }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, role: user?.role, login, logout, loading, agency, setIsAuthenticated, setUser, setAgency }}>
             {children}
         </AuthContext.Provider>
     )

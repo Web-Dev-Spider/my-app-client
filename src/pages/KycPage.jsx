@@ -14,6 +14,9 @@ const KycPage = () => {
             fName: "",
             mName: "",
             lName: "",
+            poIcode: "",
+            poINo: "",
+            poaCode: "",
             dob: "",
             fatherOrSpouse: "",
             consumerNo: "",
@@ -27,6 +30,7 @@ const KycPage = () => {
             cityTownVillage: "",
             districtName: "",
             pinCode: "",
+            poANo: "",
             docDate: new Date().toLocaleDateString('en-CA')
         }
     })
@@ -63,7 +67,7 @@ const KycPage = () => {
             const url = window.URL.createObjectURL(blob);
             window.open(url, '_blank');
         } catch (err) {
-            console.log(err);
+            // console.log(err);
         }
     }
 
@@ -76,7 +80,9 @@ const KycPage = () => {
                     <span className="text-sm font-semibold text-theme-secondary whitespace-nowrap">
                         Personal Details
                     </span>
-                    <hr className="flex-1 border-theme-color opacity-50" />
+                    <hr className="flex-1 text-theme-color opacity-100" />
+
+
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-2'>
@@ -114,14 +120,33 @@ const KycPage = () => {
                         error={errors.fatherOrSpouse}
                     />
                     <Input
-                        labelText="Consumer No"
-                        {...register("consumerNo")}
-                        error={errors.consumerNo}
+                        type="select"
+                        labelText="Proof of ID"
+                        {...register("poIcode")}
+                        error={errors.poIcode}
+                        options={[
+                            { label: "Aadhaar (UID/EID)", value: "POI01" },
+                            { label: "Passport", value: "POI02" },
+                            { label: "PAN Card", value: "POI03" },
+                            { label: "Voter ID Card", value: "POI05" },
+                            { label: "ID card Issued By Central/State", value: "POI06" },
+                            { label: "Driving License", value: "POI07" }
+                        ]}
+                    />
+                    <Input
+                        labelText="Proof of ID Number"
+                        {...register("poINo")}
+                        error={errors.poINo}
                     />
                     <Input
                         labelText="Mobile No"
                         {...register("mobNo")}
                         error={errors.mobNo}
+                    />
+                    <Input
+                        labelText="Consumer No"
+                        {...register("consumerNo")}
+                        error={errors.consumerNo}
                     />
                     <Input
                         labelText="LandLine No"
@@ -133,16 +158,43 @@ const KycPage = () => {
                         {...register("emailId")}
                         error={errors.emailId}
                     />
+
+
                 </div>
 
                 <div className="flex items-center gap-2 mb-3">
                     <span className="text-sm font-semibold text-theme-secondary whitespace-nowrap">
                         Address Details
                     </span>
-                    <hr className="flex-1 border-theme-color opacity-50" />
+                    <hr className="flex-1 text-theme-color opacity-100" />
                 </div>
 
                 <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4'>
+                    <Input
+                        type="select"
+                        labelText="Proof of Address"
+                        {...register("poaCode")}
+                        error={errors.poaCode}
+                        options={[
+                            { label: "Aadhaar (UID)", value: "POA01" },
+                            { label: "Driving License", value: "POA02" },
+                            { label: "Lease agreement", value: "POA03" },
+                            { label: "Voter ID", value: "POA05" },
+                            { label: "Telephone/Electricity /Water bill", value: "POA06" },
+                            { label: "Passport", value: "POA07" },
+                            { label: "Self-declaration attested by a Gazetted officer", value: "POA08" },
+                            { label: "Ration Card", value: "POA09" },
+                            { label: "Flat allotment/possession letter", value: "POA10" },
+                            { label: "House registration document", value: "POA11" },
+                            { label: "LIC Policy", value: "POA12" },
+                            { label: "Bank/Credit Card Statement", value: "POA13" }
+                        ]}
+                    />
+                    {/* <Input
+                        labelText="Proof of Address No"
+                        {...register("poANo")}
+                        error={errors.poANo}
+                    /> */}
                     <Input
                         labelText="House/Flat #, Name*"
                         {...register("hName")}

@@ -69,13 +69,13 @@ function App() {
           {/* Routes WITH Navbar */}
           <Route element={<Layout />}>
             <Route path="/" element={<Welcome />} />
-            <Route path="/home" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/terms-of-service" element={<TermsOfService />} />
 
 
             <Route element={<ProtectedRoute />}>
+              <Route path="/home" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/profile" element={<Profile />} />

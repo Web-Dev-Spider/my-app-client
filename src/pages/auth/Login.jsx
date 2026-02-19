@@ -29,7 +29,7 @@ function Login() {
             const data = await login(form.identifier, form.password);
 
             if (data.success) {
-                navigate(data.redirectTo || "/");
+                navigate(data.redirectTo || "/dashboard");
             } else {
                 setError(data.message || "Login failed");
             }

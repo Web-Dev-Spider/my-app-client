@@ -342,7 +342,7 @@ const SuperAdminDashboard = () => {
                                     <div>
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="font-medium text-theme-primary">IOCL</span>
-                                            <span className="text-sm font-bold text-orange-500">{Math.round((stats.distributors.IOCL / (stats.marketCounts.IOCL || 1)) * 100)}% captured</span>
+                                            <span className="text-sm font-bold text-orange-500">{Math.round((stats.distributors.IOCL / (stats.marketCounts.IOCL || 1)) * 100).toFixed(6)}% captured</span>
                                         </div>
                                         <div className="flex justify-between text-sm font-bold text-theme-secondary mb-2">
                                             <span>Registered: {stats.distributors.IOCL}</span>
@@ -351,7 +351,7 @@ const SuperAdminDashboard = () => {
                                         <div className="w-full bg-theme-tertiary rounded-full h-3 overflow-hidden">
                                             <div
                                                 className="bg-orange-500 h-3 rounded-full transition-all duration-1000 ease-out"
-                                                style={{ width: `${(stats.distributors.IOCL / (stats.marketCounts.IOCL || 1)) * 100}%` }}
+                                                style={{ width: `${(stats.distributors.IOCL / (stats.marketCounts.IOCL || 1).toFixed(6)) * 100}%` }}
                                             />
                                         </div>
                                     </div>
@@ -360,7 +360,7 @@ const SuperAdminDashboard = () => {
                                     <div>
                                         <div className="flex justify-between items-center mb-1">
                                             <span className="font-medium text-theme-primary">HPCL</span>
-                                            <span className="text-sm font-bold text-blue-600">{Math.round((stats.distributors.HPCL / (stats.marketCounts.HPCL || 1)) * 100)}% captured</span>
+                                            <span className="text-sm font-bold text-blue-600">{Math.round((stats.distributors.HPCL / (stats.marketCounts.HPCL || 1).toFixed(6)) * 100)}% captured</span>
                                         </div>
                                         <div className="flex justify-between text-sm font-bold text-theme-secondary mb-2">
                                             <span>Registered: {stats.distributors.HPCL}</span>

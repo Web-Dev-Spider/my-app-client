@@ -6,7 +6,10 @@ export const eKycSchema = z.object({
     fName: z.string().trim().min(2, "First Name must be at least 2 characters"),
     mName: z.string().trim().optional(),
     lName: z.string().trim().min(1, "Last Name is required"),
-
+    poIcode: z.string().min(1, { message: "Please select a Proof of ID" }),
+    poINo: z.string().min(1, { message: "Proof of ID Number is required" }),
+    poaCode: z.string().min(1, { message: "Please select a Proof of Address" }),
+    poANo: z.string().optional(),
     dob: z.string()
         .min(1, { message: "DOB is required" })
         .transform((val) => new Date(val))
@@ -33,7 +36,7 @@ export const eKycSchema = z.object({
     hNo: z.string().trim().max(4, "Maximum 4 characters allowed").optional(),
     wardNo: z.string().trim().max(4, "Maximum 4 characters allowed").optional(),
     roadName: z.string().trim().max(26, "Maximum 26 characters allowed"),
-    landMark: z.string().trim().max(17, "Maximum 17 characters allowed"),
+    landMark: z.string().trim().max(18, "Maximum 18 characters allowed"),
     cityTownVillage: z.string().trim().min(2, "City/Town/Village is required").max(16, "Maximum 16 characters allowed"),
     districtName: z.string().trim().min(2, "District is required").max(13, "Maximum 13 characters allowed"), // Assuming auto-filled or select, but likely text input for now
     pinCode: z.string().trim().regex(/^[0-9]{6}$/, "Pincode must be 6 digits").min(6, "Pincode must be 6 digits").max(6, "Pincode must be 6 digits"),
