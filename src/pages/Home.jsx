@@ -17,6 +17,7 @@ function Home() {
 
             <h3 className='text-green-700 font-bold text-2xl my-4 animate-pulse'>Only managing users </h3>
             <h3 className='text-green-700 font-bold text-2xl my-4 animate-pulse'>Kyc pdf creation are implemented.</h3>
+            <h5>Before using New Connection forms feature Please update agency profile in settings.</h5>
 
             <div className='flex justify-center items-center '>
 

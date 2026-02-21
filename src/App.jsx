@@ -57,6 +57,7 @@ import PlantPurchase from './pages/inventory/PlantPurchase'
 import EmptyDispatch from './pages/inventory/EmptyDispatch'
 import SupplierManagement from './pages/inventory/SupplierManagement'
 import ProductManagement from './pages/inventory/ProductManagement'
+import VehicleManagement from './pages/inventory/VehicleManagement'
 import GlobalProductMaster from './pages/admin/GlobalProductMaster'
 import PendingRegistrations from './pages/super-admin/PendingRegistrations'
 import PendingStaff from './pages/admin/PendingStaff'
@@ -86,6 +87,7 @@ function App() {
               <Route path="/inventory/suppliers" element={<SupplierManagement />} />
               <Route path="/inventory/plant-receipt" element={<PlantPurchase />} />
               <Route path="/inventory/empty-dispatch" element={<EmptyDispatch />} />
+              <Route path="/inventory/vehicles" element={<VehicleManagement />} />
             </Route>
             <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SUPER-ADMIN', 'SHOWROOM-STAFF']} />}>
               <Route path="/kyc" element={<KycPage />} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt, FaBox, FaClock } from 'react-icons/fa';
+import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt, FaBox, FaClock, FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import api from '../../axios/axiosInstance';
 import { useTheme } from '../../context/ThemeContext';
@@ -28,6 +28,7 @@ const SuperAdminDashboard = () => {
     const [agencies, setAgencies] = useState([]);
     const [pendingCount, setPendingCount] = useState(0);
     const [filter, setFilter] = useState({ company: 'ALL', status: 'ALL' });
+    const [isAgencyExpanded, setIsAgencyExpanded] = useState(false);
 
     const fetchData = async () => {
         try {
@@ -88,6 +89,7 @@ const SuperAdminDashboard = () => {
 
     const handleFilter = (company, status) => {
         setFilter({ company, status });
+        setIsAgencyExpanded(true);
     };
 
     const UserStatCard = ({ title, value, icon: Icon, colorClass, subText, details }) => (
@@ -121,7 +123,7 @@ const SuperAdminDashboard = () => {
     );
 
     const DistributorStatCard = () => (
-        <div className="bg-theme-secondary p-6 rounded-xl shadow-sm border border-theme-color hover:shadow-md transition-all duration-300 col-span-1 md:col-span-2">
+        <div className="bg-theme-secondary p-6 rounded-xl shadow-sm border border-theme-color hover:shadow-md transition-all duration-300 col-span-1 md:col-span-2 lg:col-span-2">
             <div className="flex items-center justify-between mb-1">
                 <div className="flex items-center gap-3">
                     <div className="p-3 rounded-lg bg-orange-500 bg-opacity-10">
@@ -140,7 +142,7 @@ const SuperAdminDashboard = () => {
 
             </div>
 
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
                 {/* IOCL */}
                 <div className="space-y-0">
                     <div
@@ -303,7 +305,7 @@ const SuperAdminDashboard = () => {
                 ) : (
                     <>
                         {/* Key Metrics */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                             <UserStatCard
                                 title="Total Registered Users"
                                 value={stats.totalUsers}
@@ -350,11 +352,60 @@ const SuperAdminDashboard = () => {
                         </div>
 
                         {/* Agency Management Section */}
-                        <AgencyManagement
-                            agencies={agencies}
-                            filter={filter}
-                            onToggleStatus={handleToggleStatus}
-                        />
+                        <div className="bg-theme-secondary rounded-xl border border-theme-color shadow-sm overflow-hidden">
+                            {/* Clickable Header */}
+                            <button
+                                onClick={() => setIsAgencyExpanded(prev => !prev)}
+                                className="w-full flex items-center justify-between p-6 text-left hover:bg-theme-tertiary/30 transition-colors duration-200"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 rounded-lg bg-theme-tertiary">
+                                        <FaBuilding className="text-lg text-theme-accent" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-theme-primary">
+                                            Distributor Agency Management
+                                        </h3>
+                                        <p className="text-xs text-theme-secondary mt-0.5">
+                                            {distributorStats.total} total agencies
+                                            {filter.company !== 'ALL' && (
+                                                <span className="ml-2 px-1.5 py-0.5 rounded bg-theme-tertiary font-semibold text-theme-primary">
+                                                    {filter.company}{filter.status !== 'ALL' && ` · ${filter.status}`}
+                                                </span>
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    {filter.company !== 'ALL' && (
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setFilter({ company: 'ALL', status: 'ALL' });
+                                            }}
+                                            className="text-xs px-2 py-1 rounded-full bg-theme-accent/10 text-theme-accent border border-theme-accent/30 hover:bg-theme-accent/20 transition-colors"
+                                        >
+                                            Clear filter
+                                        </button>
+                                    )}
+                                    {isAgencyExpanded
+                                        ? <FaChevronUp className="text-theme-secondary text-sm flex-shrink-0" />
+                                        : <FaChevronDown className="text-theme-secondary text-sm flex-shrink-0" />
+                                    }
+                                </div>
+                            </button>
+
+                            {/* Collapsible Body */}
+                            {isAgencyExpanded && (
+                                <div className="border-t border-theme-color">
+                                    <AgencyManagement
+                                        agencies={agencies}
+                                        filter={filter}
+                                        onToggleStatus={handleToggleStatus}
+                                    />
+                                </div>
+                            )}
+                        </div>
 
                         {/* Distributor Breakdown */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">

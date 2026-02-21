@@ -94,18 +94,6 @@ function Navbar() {
                                         Live Stock
                                     </NavLink>
                                     <NavLink
-                                        to="/inventory/products"
-                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
-                                    >
-                                        Manage Products
-                                    </NavLink>
-                                    <NavLink
-                                        to="/inventory/suppliers"
-                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
-                                    >
-                                        Manage Suppliers
-                                    </NavLink>
-                                    <NavLink
                                         to="/inventory/plant-receipt"
                                         className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                                     >
@@ -253,20 +241,6 @@ function Navbar() {
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     Live Stock
-                                </NavLink>
-                                <NavLink
-                                    to="/inventory/products"
-                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    Manage Products
-                                </NavLink>
-                                <NavLink
-                                    to="/inventory/suppliers"
-                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    Manage Suppliers
                                 </NavLink>
                                 <NavLink
                                     to="/inventory/plant-receipt"

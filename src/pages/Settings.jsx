@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FaCog, FaPalette, FaUser, FaBell, FaLock, FaChevronRight, FaBuilding } from 'react-icons/fa';
+import { FaCog, FaPalette, FaUser, FaBell, FaLock, FaChevronRight, FaBuilding, FaBox, FaTruck, FaUsers } from 'react-icons/fa';
 
 import UserManagementForm from '../components/settings/UserManagementForm';
 import AgencySettings from '../components/settings/AgencySettings';
 import AccountSettings from '../components/settings/AccountSettings';
 import AppearanceSettings from '../components/settings/AppearanceSettings';
 import GeneralSettings from '../components/settings/GeneralSettings';
+import ProductManagement from './inventory/ProductManagement';
+import SupplierManagement from './inventory/SupplierManagement';
+import VehicleManagement from './inventory/VehicleManagement';
 
 const Settings = () => {
     const { user } = useAuth();
@@ -20,6 +23,9 @@ const Settings = () => {
         { id: 'security', label: 'Security', icon: FaLock },
         ...(user?.role === 'ADMIN' ? [{ id: 'users', label: 'Manage Users', icon: FaUser }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'agency', label: 'Agency', icon: FaBuilding }] : []),
+        ...(user?.role === 'ADMIN' ? [{ id: 'products', label: 'Manage Products', icon: FaBox }] : []),
+        ...(user?.role === 'ADMIN' ? [{ id: 'suppliers', label: 'Manage Suppliers', icon: FaUsers }] : []),
+        ...(user?.role === 'ADMIN' ? [{ id: 'vehicles', label: 'Vehicles', icon: FaTruck }] : []),
     ];
 
     const renderContent = () => {
@@ -50,6 +56,12 @@ const Settings = () => {
                         <AgencySettings />
                     </div>
                 );
+            case 'products':
+                return <ProductManagement />;
+            case 'suppliers':
+                return <SupplierManagement />;
+            case 'vehicles':
+                return <VehicleManagement />;
             case 'notifications':
             case 'security':
                 return (
