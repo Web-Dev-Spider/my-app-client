@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
-import { FaUser, FaLock } from 'react-icons/fa';
+import { FaUser, FaLock, FaBan } from 'react-icons/fa';
 
 function Login() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, accessDeniedMessage, setAccessDeniedMessage } = useAuth();
     const [form, setForm] = useState({
         identifier: "",
         password: ""
@@ -23,6 +23,7 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+        setAccessDeniedMessage(""); // Clear access denied message on new login attempt
         setLoading(true);
 
         try {
@@ -45,6 +46,14 @@ function Login() {
 
     return (
         <div className="w-full max-w-sm mx-auto mt-20 p-8 bg-theme-secondary rounded-xl border border-theme-color shadow-sm animate-fadeIn">
+
+            {/* Access Denied Banner */}
+            {accessDeniedMessage && (
+                <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30 text-center">
+                    <FaBan className="mx-auto text-red-500 text-2xl mb-2" />
+                    <p className="text-red-500 text-sm font-semibold">{accessDeniedMessage}</p>
+                </div>
+            )}
 
             <div className="text-center mb-8">
                 <h2 className="text-2xl font-bold text-theme-primary">Login</h2>

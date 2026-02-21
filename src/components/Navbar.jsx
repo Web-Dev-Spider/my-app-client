@@ -65,7 +65,7 @@ function Navbar() {
                                         to="/kyc"
                                         className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                                     >
-                                        Create KYC
+                                        New Connection Forms
                                     </NavLink>
                                     <NavLink
                                         to="/sv-loss"

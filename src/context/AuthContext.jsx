@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null)
     const [agency, setAgency] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [accessDeniedMessage, setAccessDeniedMessage] = useState("")
 
     // Check auth on page refresh
     useEffect(() => {
@@ -30,19 +31,28 @@ export const AuthProvider = ({ children }) => {
                 const res = await api.get("/auth/me", {
                     withCredentials: true
                 })
-                // console.log("res.data in checkAuth AuthContext", res.data)
-                setIsAuthenticated(true)
-                setUser(res.data.user)
-                setAgency(res.data.agency)
-            } catch (err) {
-                // console.log("Error catched at ", err)
 
-                if (err.response?.status !== 401) {
-                    console.error(err)
+                // Must check success BEFORE setting state — axios resolves 401/403 due to validateStatus
+                if (res.data.success && res.data.user) {
+                    setIsAuthenticated(true)
+                    setUser(res.data.user)
+                    setAgency(res.data.agency || null)
+                } else {
+                    // Handle agency deactivation (403 Forbidden)
+                    if (res.status === 403) {
+                        localStorage.removeItem("hasSession")
+                        setAccessDeniedMessage(res.data.message || "Access is denied, contact the administrator")
+                    }
+                    setIsAuthenticated(false)
+                    setUser(null)
+                    setAgency(null)
                 }
+            } catch (err) {
+                // Only network errors or 500+ will land here (due to validateStatus)
+                console.error(err)
                 setIsAuthenticated(false)
                 setUser(null)
-                return null
+                setAgency(null)
             } finally {
                 setLoading(false)
             }
@@ -55,6 +65,7 @@ export const AuthProvider = ({ children }) => {
     const login = async (identifier, password) => {
         // console.log("identifier", identifier)
         // console.log("password", password)
+        setAccessDeniedMessage("") // Clear any previous denial message
         try {
             const res = await api.post("/auth/login", { identifier, password }, {
                 withCredentials: true
@@ -74,7 +85,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
 
             // console.log(error.response.data.message)
-            return { success: false, message: error.response.data.message }
+            return { success: false, message: error.response?.data?.message || "Unable to login. Please try again." }
         }
     }
 
@@ -82,13 +93,17 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         await api.get("/auth/logout", { withCredentials: true })
         localStorage.removeItem("hasSession")
+        // Clean up stale keys from old code
+        localStorage.removeItem("token")
+        localStorage.removeItem("role")
         setIsAuthenticated(false)
         setUser(null)
         setAgency(null)
+        setAccessDeniedMessage("")
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, role: user?.role, login, logout, loading, agency, setIsAuthenticated, setUser, setAgency }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, role: user?.role, login, logout, loading, agency, setIsAuthenticated, setUser, setAgency, accessDeniedMessage, setAccessDeniedMessage }}>
             {children}
         </AuthContext.Provider>
     )

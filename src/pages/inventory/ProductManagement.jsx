@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../axios/axiosInstance';
-import { FaBoxOpen, FaPlus, FaEdit, FaCheck, FaTimes, FaFilter, FaSearch, FaArrowRight } from 'react-icons/fa';
+import { FaBoxOpen, FaPlus, FaEdit, FaCheck, FaTimes, FaFilter, FaSearch, FaArrowRight, FaLock } from 'react-icons/fa';
 import { BsFuelPump, BsTools } from 'react-icons/bs';
 
 const ProductManagement = () => {
@@ -222,6 +222,20 @@ const ProductManagement = () => {
     const [showGlobalModal, setShowGlobalModal] = useState(false);
     const [globalProducts, setGlobalProducts] = useState([]);
     const [selectedGlobalForMap, setSelectedGlobalForMap] = useState(null);
+    const [globalSearchTerm, setGlobalSearchTerm] = useState('');
+
+    // Filter global products by search term
+    const filteredGlobalProducts = globalProducts.filter(gp => {
+        if (!globalSearchTerm) return true;
+        const term = globalSearchTerm.toLowerCase();
+        return (
+            gp.name.toLowerCase().includes(term) ||
+            (gp.productCode && gp.productCode.toLowerCase().includes(term)) ||
+            (gp.productType && gp.productType.toLowerCase().includes(term)) ||
+            (gp.category && gp.category.toLowerCase().includes(term)) ||
+            (gp.subcategory && gp.subcategory.toLowerCase().includes(term))
+        );
+    });
     const [mapConfig, setMapConfig] = useState({
         purchasePrice: '',
         salePrice: '',
@@ -238,6 +252,7 @@ const ProductManagement = () => {
             const res = await api.get('/inventory/products/unmapped');
             if (res.data.success) {
                 setGlobalProducts(res.data.products);
+                setGlobalSearchTerm('');
                 setShowGlobalModal(true);
             }
         } catch (error) {
@@ -289,8 +304,11 @@ const ProductManagement = () => {
             if (res.data.success) {
                 setMessage({ text: 'Product added successfully', type: 'success' });
                 fetchProducts();
-                // Remove from local list
-                setGlobalProducts(prev => prev.filter(p => p._id !== selectedGlobalForMap._id));
+                // Only remove non-NFR products from the list after mapping.
+                // NFR products stay so the user can add more variants from the same template.
+                if (selectedGlobalForMap.productType !== 'NFR') {
+                    setGlobalProducts(prev => prev.filter(p => p._id !== selectedGlobalForMap._id));
+                }
                 setSelectedGlobalForMap(null);
             }
         } catch (error) {
@@ -732,8 +750,21 @@ const ProductManagement = () => {
                                 <FaTimes size={14} />
                             </button>
                         </div>
+                        {/* Search within global products */}
+                        <div className="px-4 py-2 border-b border-theme-color bg-theme-tertiary/50">
+                            <div className="flex items-center bg-theme-secondary border border-theme-color rounded-lg px-2.5 py-1.5 focus-within:ring-2 ring-theme-accent transition-all">
+                                <FaSearch className="text-theme-secondary mr-2" size={12} />
+                                <input
+                                    type="text"
+                                    placeholder="Search by name, code, or type..."
+                                    value={globalSearchTerm}
+                                    onChange={(e) => setGlobalSearchTerm(e.target.value)}
+                                    className="bg-transparent border-none outline-none text-xs w-full text-theme-primary placeholder-theme-secondary/50"
+                                />
+                            </div>
+                        </div>
                         <div className="p-0 overflow-y-auto custom-scrollbar">
-                            {globalProducts.length === 0 ? (
+                            {filteredGlobalProducts.length === 0 ? (
                                 <div className="p-8 text-center text-theme-secondary">No unmapped global products found.</div>
                             ) : (
                                 <table className="w-full text-sm text-left">
@@ -742,23 +773,39 @@ const ProductManagement = () => {
                                             <th className="px-4 py-2">Product Name</th>
                                             <th className="px-4 py-2">Code</th>
                                             <th className="px-4 py-2">Type</th>
+                                            <th className="px-4 py-2">Details</th>
                                             <th className="px-4 py-2 text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-theme-color">
-                                        {globalProducts.map(gp => (
+                                        {filteredGlobalProducts.map(gp => (
                                             <tr key={gp._id} className="hover:bg-theme-tertiary/50 transition-colors">
-                                                <td className="px-4 py-2 font-medium text-theme-primary">{gp.name}</td>
+                                                <td className="px-4 py-2 font-medium text-theme-primary">
+                                                    {gp.name}
+                                                    {gp.isFiber && (
+                                                        <span className="ml-1.5 text-[9px] bg-orange-50 text-orange-600 px-1.5 py-0.5 rounded border border-orange-100">Fiber</span>
+                                                    )}
+                                                </td>
                                                 <td className="px-4 py-2 text-theme-secondary font-mono text-xs">{gp.productCode}</td>
+                                                <td className="px-4 py-2">
+                                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${gp.productType === 'CYLINDER' ? 'bg-blue-50 text-blue-700 border border-blue-100' : gp.productType === 'PR' ? 'bg-purple-50 text-purple-700 border border-purple-100' : 'bg-green-50 text-green-700 border border-green-100'}`}>
+                                                        {gp.productType === 'CYLINDER' ? 'Cylinder' : (gp.productType === 'PR' ? 'PR' : 'NFR')}
+                                                    </span>
+                                                </td>
                                                 <td className="px-4 py-2 text-theme-secondary text-xs">
-                                                    {gp.productType === 'CYLINDER' ? 'Cylinder' : (gp.productType === 'PR' ? 'Pressure Regulator' : 'NFR')}
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {gp.category && <span className="text-[9px] bg-theme-tertiary px-1.5 py-0.5 rounded">{gp.category}</span>}
+                                                        {gp.subcategory && <span className="text-[9px] bg-theme-tertiary px-1.5 py-0.5 rounded">{gp.subcategory}</span>}
+                                                        {gp.capacityKg && <span className="text-[9px] bg-theme-tertiary px-1.5 py-0.5 rounded">{gp.capacityKg}kg</span>}
+                                                        {gp.variant && <span className="text-[9px] bg-theme-tertiary px-1.5 py-0.5 rounded">{gp.variant}</span>}
+                                                    </div>
                                                 </td>
                                                 <td className="px-4 py-2 text-center">
                                                     <button
                                                         onClick={() => openMapConfig(gp)}
-                                                        className="bg-theme-accent text-white px-2 py-1 rounded text-xs font-bold hover:bg-theme-accent/90 transition-colors"
+                                                        className="bg-theme-accent text-white px-2 py-1 rounded text-xs font-bold hover:bg-theme-accent/90 transition-colors flex items-center gap-1 mx-auto"
                                                     >
-                                                        Configure & Add
+                                                        <FaArrowRight size={8} /> Add
                                                     </button>
                                                 </td>
                                             </tr>
@@ -771,176 +818,263 @@ const ProductManagement = () => {
                 </div>
             )}
 
-            {/* Config Modal for Mapping */}
+            {/* Config Modal for Mapping — shows read-only template + editable agency fields */}
             {selectedGlobalForMap && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 animate-fadeIn backdrop-blur-sm">
-                    <div className="bg-theme-secondary rounded-lg shadow-xl w-full max-w-sm overflow-hidden flex flex-col border border-theme-color">
-                        <div className="px-4 py-3 border-b border-theme-color flex justify-between items-center bg-theme-tertiary">
+                    <div className="bg-theme-secondary rounded-lg shadow-xl w-full max-w-md overflow-hidden flex flex-col max-h-[90vh] border border-theme-color">
+                        <div className="px-4 py-3 border-b border-theme-color flex justify-between items-center bg-theme-tertiary flex-shrink-0">
                             <h2 className="text-base font-bold text-theme-primary">
-                                Configure: {selectedGlobalForMap.name}
+                                Add to Inventory
                             </h2>
                             <button onClick={() => setSelectedGlobalForMap(null)} className="text-theme-secondary hover:text-theme-primary">
                                 <FaTimes size={14} />
                             </button>
                         </div>
-                        <form onSubmit={handleConfirmMap} className="p-4 space-y-3">
-                            <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label className="block text-[10px] font-medium text-theme-secondary mb-0.5">Buy Price</label>
-                                    <input
-                                        type="number"
-                                        value={mapConfig.purchasePrice}
-                                        onChange={(e) => setMapConfig({ ...mapConfig, purchasePrice: e.target.value })}
-                                        className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                        step="0.01"
-                                    />
+
+                        <div className="overflow-y-auto custom-scrollbar">
+                            {/* ── Read-Only Product Template ── */}
+                            <div className="px-4 pt-4 pb-3">
+                                <div className="flex items-center gap-1.5 mb-2">
+                                    <FaLock size={10} className="text-theme-secondary" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-theme-secondary">Product Template (Read-Only)</span>
                                 </div>
-                                <div>
-                                    <label className="block text-[10px] font-medium text-theme-secondary mb-0.5">Sell Price</label>
-                                    <input
-                                        type="number"
-                                        value={mapConfig.salePrice}
-                                        onChange={(e) => setMapConfig({ ...mapConfig, salePrice: e.target.value })}
-                                        className={`w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent ${selectedGlobalForMap.productType === 'PR' && selectedGlobalForMap.category && selectedGlobalForMap.category.includes('Domestic') ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                        step="0.01"
-                                        disabled={selectedGlobalForMap.productType === 'PR' && selectedGlobalForMap.category && selectedGlobalForMap.category.includes('Domestic')}
-                                    />
+                                <div className="bg-theme-tertiary/60 rounded-lg border border-theme-color p-3 space-y-2">
+                                    {/* Product Header */}
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <div className="text-sm font-bold text-theme-primary">{selectedGlobalForMap.name}</div>
+                                            <div className="text-[11px] font-mono text-theme-secondary">{selectedGlobalForMap.productCode}</div>
+                                        </div>
+                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${selectedGlobalForMap.productType === 'CYLINDER' ? 'bg-blue-100 text-blue-700' : selectedGlobalForMap.productType === 'PR' ? 'bg-purple-100 text-purple-700' : 'bg-green-100 text-green-700'}`}>
+                                            {selectedGlobalForMap.productType}
+                                        </span>
+                                    </div>
+
+                                    {/* Properties Grid */}
+                                    <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 pt-1 border-t border-theme-color/40">
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-theme-secondary">Category</span>
+                                            <span className="text-[10px] font-semibold text-theme-primary">{selectedGlobalForMap.category || '—'}</span>
+                                        </div>
+                                        {selectedGlobalForMap.subcategory && (
+                                            <div className="flex justify-between">
+                                                <span className="text-[10px] text-theme-secondary">Subcategory</span>
+                                                <span className="text-[10px] font-semibold text-theme-primary">{selectedGlobalForMap.subcategory}</span>
+                                            </div>
+                                        )}
+                                        {selectedGlobalForMap.capacityKg && (
+                                            <div className="flex justify-between">
+                                                <span className="text-[10px] text-theme-secondary">Capacity</span>
+                                                <span className="text-[10px] font-semibold text-theme-primary">{selectedGlobalForMap.capacityKg} kg</span>
+                                            </div>
+                                        )}
+                                        {selectedGlobalForMap.variant && (
+                                            <div className="flex justify-between">
+                                                <span className="text-[10px] text-theme-secondary">Variant</span>
+                                                <span className="text-[10px] font-semibold text-theme-primary">{selectedGlobalForMap.variant}</span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-theme-secondary">Valuation</span>
+                                            <span className="text-[10px] font-semibold text-theme-primary">{selectedGlobalForMap.valuationType || '—'}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-theme-secondary">Unit</span>
+                                            <span className="text-[10px] font-semibold text-theme-primary">{selectedGlobalForMap.unit || 'NOS'}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-theme-secondary">HSN Code</span>
+                                            <span className="text-[10px] font-semibold text-theme-primary font-mono">{selectedGlobalForMap.hsnCode || '—'}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-[10px] text-theme-secondary">Tax Rate</span>
+                                            <span className="text-[10px] font-semibold text-theme-primary">{selectedGlobalForMap.taxRate != null ? `${selectedGlobalForMap.taxRate}%` : '—'}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Flags */}
+                                    <div className="flex gap-2 pt-1 border-t border-theme-color/40">
+                                        {selectedGlobalForMap.isFiber && (
+                                            <span className="text-[9px] font-bold bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">Fiber Composite</span>
+                                        )}
+                                        {selectedGlobalForMap.isReturnable && (
+                                            <span className="text-[9px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Returnable</span>
+                                        )}
+                                        {!selectedGlobalForMap.isFiber && !selectedGlobalForMap.isReturnable && (
+                                            <span className="text-[9px] text-theme-secondary italic">No special flags</span>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Opening Stock Section — adapts to product type */}
-                            <div className="p-2 bg-theme-tertiary/50 rounded border border-theme-color/50">
-                                <label className="block text-[10px] font-bold text-theme-primary mb-1.5 border-b border-theme-color pb-0.5">
-                                    Opening Stock
-                                    <span className="font-normal text-theme-secondary ml-1">({selectedGlobalForMap.productType})</span>
-                                </label>
+                            {/* ── Editable Agency Configuration ── */}
+                            <form onSubmit={handleConfirmMap} className="px-4 pb-4 space-y-3">
+                                <div className="flex items-center gap-1.5 mt-1">
+                                    <FaEdit size={10} className="text-theme-accent" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-theme-accent">Agency Configuration</span>
+                                </div>
 
-                                {/* CYLINDER: Filled / Empty / Defective */}
-                                {selectedGlobalForMap.productType === 'CYLINDER' && (
-                                    <div className="grid grid-cols-3 gap-2">
-                                        <div>
-                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Filled</label>
-                                            <input
-                                                type="number"
-                                                value={mapConfig.openingStockFilled}
-                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockFilled: e.target.value })}
-                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Empty</label>
-                                            <input
-                                                type="number"
-                                                value={mapConfig.openingStockEmpty}
-                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockEmpty: e.target.value })}
-                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
-                                            <input
-                                                type="number"
-                                                value={mapConfig.openingStockDefective}
-                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockDefective: e.target.value })}
-                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                                placeholder="0"
-                                            />
-                                        </div>
+                                {/* Pricing */}
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="block text-[10px] font-medium text-theme-secondary mb-0.5">Buy Price (₹)</label>
+                                        <input
+                                            type="number"
+                                            value={mapConfig.purchasePrice}
+                                            onChange={(e) => setMapConfig({ ...mapConfig, purchasePrice: e.target.value })}
+                                            className="w-full border border-theme-color rounded px-2 py-1.5 text-xs bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                            step="0.01"
+                                            placeholder="0.00"
+                                        />
                                     </div>
-                                )}
-
-                                {/* PR: Sound / Defective */}
-                                {selectedGlobalForMap.productType === 'PR' && (
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div>
-                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Sound</label>
-                                            <input
-                                                type="number"
-                                                value={mapConfig.openingStockSound}
-                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockSound: e.target.value })}
-                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
-                                            <input
-                                                type="number"
-                                                value={mapConfig.openingStockDefectivePR}
-                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockDefectivePR: e.target.value })}
-                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                                placeholder="0"
-                                            />
-                                        </div>
+                                    <div>
+                                        <label className="block text-[10px] font-medium text-theme-secondary mb-0.5">Sell Price (₹)</label>
+                                        <input
+                                            type="number"
+                                            value={mapConfig.salePrice}
+                                            onChange={(e) => setMapConfig({ ...mapConfig, salePrice: e.target.value })}
+                                            className={`w-full border border-theme-color rounded px-2 py-1.5 text-xs bg-theme-tertiary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent ${selectedGlobalForMap.productType === 'PR' && selectedGlobalForMap.category && selectedGlobalForMap.category.includes('Domestic') ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            step="0.01"
+                                            placeholder="0.00"
+                                            disabled={selectedGlobalForMap.productType === 'PR' && selectedGlobalForMap.category && selectedGlobalForMap.category.includes('Domestic')}
+                                        />
                                     </div>
-                                )}
+                                </div>
 
-                                {/* NFR: localName, itemCode, priceEffectiveDate + Quantity */}
-                                {selectedGlobalForMap.productType === 'NFR' && (
-                                    <div className="space-y-2">
-                                        <div>
-                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Local Name</label>
-                                            <input
-                                                type="text"
-                                                value={mapConfig.localName}
-                                                onChange={(e) => setMapConfig({ ...mapConfig, localName: e.target.value })}
-                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                                placeholder="Product display name"
-                                            />
+                                {/* Opening Stock — adapts to product type */}
+                                <div className="p-2.5 bg-theme-tertiary/50 rounded-lg border border-theme-color/50">
+                                    <label className="block text-[10px] font-bold text-theme-primary mb-2 border-b border-theme-color pb-1">
+                                        Opening Stock
+                                        <span className="font-normal text-theme-secondary ml-1">({selectedGlobalForMap.productType})</span>
+                                    </label>
+
+                                    {/* CYLINDER: Filled / Empty / Defective */}
+                                    {selectedGlobalForMap.productType === 'CYLINDER' && (
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Filled</label>
+                                                <input
+                                                    type="number"
+                                                    value={mapConfig.openingStockFilled}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, openingStockFilled: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Empty</label>
+                                                <input
+                                                    type="number"
+                                                    value={mapConfig.openingStockEmpty}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, openingStockEmpty: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
+                                                <input
+                                                    type="number"
+                                                    value={mapConfig.openingStockDefective}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, openingStockDefective: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    placeholder="0"
+                                                />
+                                            </div>
                                         </div>
+                                    )}
+
+                                    {/* PR: Sound / Defective */}
+                                    {selectedGlobalForMap.productType === 'PR' && (
                                         <div className="grid grid-cols-2 gap-2">
                                             <div>
-                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Item Code</label>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Sound</label>
                                                 <input
-                                                    type="text"
-                                                    value={mapConfig.itemCode}
-                                                    onChange={(e) => setMapConfig({ ...mapConfig, itemCode: e.target.value })}
-                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent font-mono"
-                                                    placeholder="ITEM001"
+                                                    type="number"
+                                                    value={mapConfig.openingStockSound}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, openingStockSound: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    placeholder="0"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Price Effective Date</label>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Defective</label>
                                                 <input
-                                                    type="date"
-                                                    value={mapConfig.priceEffectiveDate}
-                                                    onChange={(e) => setMapConfig({ ...mapConfig, priceEffectiveDate: e.target.value })}
+                                                    type="number"
+                                                    value={mapConfig.openingStockDefectivePR}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, openingStockDefectivePR: e.target.value })}
                                                     className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    placeholder="0"
                                                 />
                                             </div>
                                         </div>
-                                        <div>
-                                            <label className="block text-[9px] text-theme-secondary mb-0.5">Opening Quantity</label>
-                                            <input
-                                                type="number"
-                                                value={mapConfig.openingStockQuantity}
-                                                onChange={(e) => setMapConfig({ ...mapConfig, openingStockQuantity: e.target.value })}
-                                                className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
-                                                placeholder="0"
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                                    )}
 
-                            <div className="flex justify-end gap-2 pt-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setSelectedGlobalForMap(null)}
-                                    className="px-3 py-1.5 border border-theme-color rounded text-xs text-theme-secondary hover:bg-theme-tertiary"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="bg-theme-accent text-white px-4 py-1.5 rounded text-xs hover:bg-theme-accent/90 transition-all font-bold"
-                                >
-                                    Internalize Product
-                                </button>
-                            </div>
-                        </form>
+                                    {/* NFR: localName, itemCode, priceEffectiveDate + Quantity */}
+                                    {selectedGlobalForMap.productType === 'NFR' && (
+                                        <div className="space-y-2">
+                                            <div>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Local Name (Optional Override)</label>
+                                                <input
+                                                    type="text"
+                                                    value={mapConfig.localName}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, localName: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    placeholder="Product display name"
+                                                />
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <label className="block text-[9px] text-theme-secondary mb-0.5">Item Code</label>
+                                                    <input
+                                                        type="text"
+                                                        value={mapConfig.itemCode}
+                                                        onChange={(e) => setMapConfig({ ...mapConfig, itemCode: e.target.value })}
+                                                        className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent font-mono"
+                                                        placeholder="ITEM001"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-[9px] text-theme-secondary mb-0.5">Price Effective Date</label>
+                                                    <input
+                                                        type="date"
+                                                        value={mapConfig.priceEffectiveDate}
+                                                        onChange={(e) => setMapConfig({ ...mapConfig, priceEffectiveDate: e.target.value })}
+                                                        className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <label className="block text-[9px] text-theme-secondary mb-0.5">Opening Quantity</label>
+                                                <input
+                                                    type="number"
+                                                    value={mapConfig.openingStockQuantity}
+                                                    onChange={(e) => setMapConfig({ ...mapConfig, openingStockQuantity: e.target.value })}
+                                                    className="w-full border border-theme-color rounded px-2 py-1 text-xs bg-theme-secondary text-theme-primary focus:outline-none focus:ring-1 focus:ring-theme-accent"
+                                                    placeholder="0"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="flex justify-end gap-2 pt-2 border-t border-theme-color">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedGlobalForMap(null)}
+                                        className="px-3 py-1.5 border border-theme-color rounded text-xs text-theme-secondary hover:bg-theme-tertiary"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="bg-theme-accent text-white px-4 py-1.5 rounded text-xs hover:bg-theme-accent/90 transition-all font-bold"
+                                    >
+                                        Confirm & Add to Inventory
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
