@@ -58,6 +58,8 @@ import EmptyDispatch from './pages/inventory/EmptyDispatch'
 import SupplierManagement from './pages/inventory/SupplierManagement'
 import ProductManagement from './pages/inventory/ProductManagement'
 import GlobalProductMaster from './pages/admin/GlobalProductMaster'
+import PendingRegistrations from './pages/super-admin/PendingRegistrations'
+import PendingStaff from './pages/admin/PendingStaff'
 import './app.css'
 function App() {
 
@@ -99,6 +101,12 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/super-admin/products" element={<GlobalProductMaster />} />
+            <Route path="/super-admin/pending-registrations" element={<PendingRegistrations />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+            <Route path="/admin/pending-staff" element={<PendingStaff />} />
           </Route>
 
           <Route path="/*" element={<Navigate to="/" />} />

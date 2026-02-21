@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext'
 
 function Home() {
 
-    const { isAuthenticated, user } = useAuth()
+    const { user } = useAuth()
     // console.log(user)
 
     return (

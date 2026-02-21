@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt, FaBox } from 'react-icons/fa';
+import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt, FaBox, FaClock } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import api from '../../axios/axiosInstance';
 import { useTheme } from '../../context/ThemeContext';
@@ -26,13 +26,15 @@ const SuperAdminDashboard = () => {
     });
     const [loading, setLoading] = useState(true);
     const [agencies, setAgencies] = useState([]);
+    const [pendingCount, setPendingCount] = useState(0);
     const [filter, setFilter] = useState({ company: 'ALL', status: 'ALL' });
 
     const fetchData = async () => {
         try {
-            const [statsRes, agenciesRes] = await Promise.all([
+            const [statsRes, agenciesRes, pendingRes] = await Promise.all([
                 api.get('/admin/stats'),
-                api.get('/admin/agencies')
+                api.get('/admin/agencies'),
+                api.get('/admin/pending-registrations')
             ]);
 
             if (statsRes.data.success) {
@@ -46,6 +48,10 @@ const SuperAdminDashboard = () => {
 
             if (agenciesRes.data.success) {
                 setAgencies(agenciesRes.data.agencies);
+            }
+
+            if (pendingRes.data.success) {
+                setPendingCount(pendingRes.data.data.length);
             }
         } catch (error) {
             console.error("Failed to fetch admin data", error);
@@ -317,6 +323,29 @@ const SuperAdminDashboard = () => {
                                 subText="Engagement Rate"
                             />
 
+                            <div
+                                onClick={() => navigate('/super-admin/pending-registrations')}
+                                className="bg-theme-secondary p-6 rounded-xl shadow-sm border border-theme-color hover:shadow-md hover:border-yellow-500 transition-all duration-300 group cursor-pointer"
+                            >
+                                <div className="flex items-start justify-between mb-4">
+                                    <div>
+                                        <h3 className="text-theme-secondary text-sm font-medium uppercase tracking-wider mb-1">Pending Approvals</h3>
+                                        <div className="text-3xl font-bold text-theme-primary mb-2 number-animation">
+                                            {pendingCount}
+                                        </div>
+                                        <p className="text-xs text-theme-secondary opacity-70">Awaiting Review</p>
+                                    </div>
+                                    <div className="p-3 rounded-lg bg-yellow-500 bg-opacity-10 group-hover:bg-opacity-20 transition-colors">
+                                        <FaClock className="text-2xl text-yellow-500" />
+                                    </div>
+                                </div>
+                                {pendingCount > 0 && (
+                                    <div className="text-xs text-yellow-600 font-semibold mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                                        {pendingCount} registration{pendingCount !== 1 ? 's' : ''} pending approval
+                                    </div>
+                                )}
+                            </div>
+
                             <DistributorStatCard />
                         </div>
 
@@ -423,6 +452,18 @@ const SuperAdminDashboard = () => {
                             <div className="bg-theme-secondary rounded-xl border border-theme-color shadow-sm p-6 flex flex-col">
                                 <h3 className="text-lg font-bold text-theme-primary mb-4">Quick Actions</h3>
                                 <div className="space-y-3 flex-1">
+                                    {pendingCount > 0 && (
+                                        <button
+                                            onClick={() => navigate('/super-admin/pending-registrations')}
+                                            className="w-full p-3 rounded-lg border-2 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 text-left flex items-center justify-between group transition-colors"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <FaClock className="text-yellow-600" />
+                                                <span className="text-sm font-bold text-yellow-700">Review Pending Registrations ({pendingCount})</span>
+                                            </div>
+                                            <span className="text-xs text-yellow-600 opacity-100 group-hover:opacity-100 transition-opacity">Go &rarr;</span>
+                                        </button>
+                                    )}
                                     <button onClick={() => navigate('/super-admin/products')} className="w-full p-3 rounded-lg border border-theme-color hover:bg-theme-tertiary text-left flex items-center justify-between group transition-colors">
                                         <div className="flex items-center gap-2">
                                             <FaBox className="text-theme-secondary group-hover:text-theme-accent" />

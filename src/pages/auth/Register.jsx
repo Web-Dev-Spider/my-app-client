@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FaBuilding, FaIdBadge, FaEnvelope, FaLock } from 'react-icons/fa';
+import { FaBuilding, FaIdBadge, FaEnvelope, FaLock, FaCheckCircle } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom'
 import api from '../../axios/axiosInstance'
 
@@ -7,6 +7,8 @@ function Register() {
 
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
+    const [registrationSuccess, setRegistrationSuccess] = useState(false)
+    const [registrationEmail, setRegistrationEmail] = useState("")
     const [registrationData, setRegistrationData] = useState({
         gasAgencyName: '',
         sapcode: '',
@@ -32,8 +34,8 @@ function Register() {
             const res = await api.post(`/auth/register`, registrationData)
 
             if (res.data.success) {
-                alert(res.data.message || `Registration successful! Please login with your email or username: admin_${registrationData.sapcode}`);
-                navigate('/login')
+                setRegistrationSuccess(true)
+                setRegistrationEmail(registrationData.email)
             } else {
                 setError(res.data.message || "Registration failed")
             }
@@ -44,6 +46,61 @@ function Register() {
         } finally {
             setLoading(false)
         }
+    }
+
+    // Success state - show pending approval message
+    if (registrationSuccess) {
+        return (
+            <div className="w-full max-w-lg mx-auto mt-10 p-6 bg-theme-secondary rounded-xl border border-theme-color shadow-sm animate-fadeIn">
+                <div className="text-center">
+                    <FaCheckCircle className="text-green-500 text-4xl mx-auto mb-4" />
+                    <h2 className="text-xl font-bold text-theme-primary mb-2">Registration Successful!</h2>
+                    <p className="text-sm text-theme-secondary mb-4">
+                        Your agency registration has been received.
+                    </p>
+                </div>
+
+                <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-6">
+                    <p className="text-sm text-theme-primary mb-3 font-semibold">Next Steps:</p>
+                    <ul className="text-xs text-theme-secondary space-y-2">
+                        <li>✓ Your registration is currently <span className="font-semibold text-yellow-600">pending admin approval</span></li>
+                        <li>✓ We've sent a confirmation email to <span className="font-semibold text-theme-primary">{registrationEmail}</span></li>
+                        <li>✓ You'll receive another email once your registration is approved</li>
+                        <li>✓ After approval, you can log in with your email/username and password</li>
+                    </ul>
+                </div>
+
+                <div className="bg-theme-input border border-theme-color rounded-lg p-4 mb-6">
+                    <p className="text-xs text-theme-secondary mb-2 font-semibold">Registration Details:</p>
+                    <div className="space-y-2 text-xs">
+                        <div className="flex justify-between">
+                            <span className="text-theme-secondary">Email:</span>
+                            <span className="text-theme-primary font-semibold">{registrationEmail}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-theme-secondary">Username:</span>
+                            <span className="text-theme-primary font-semibold">admin_{registrationData.sapcode}</span>
+                        </div>
+                        <div className="flex justify-between">
+                            <span className="text-theme-secondary">Status:</span>
+                            <span className="text-yellow-600 font-semibold">Pending Approval</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p className="text-xs text-theme-secondary text-center mb-4">
+                    Check your email inbox and spam folder for our notifications.
+                </p>
+
+                <button
+                    onClick={() => navigate('/')}
+                    className="w-full py-2.5 rounded-lg bg-theme-accent text-theme-primary font-bold shadow-md hover:shadow-lg hover:opacity-95 transform active:scale-[0.98] transition-all duration-200 text-sm"
+                    style={{ color: 'var(--bg-primary)' }}
+                >
+                    Return to Home
+                </button>
+            </div>
+        )
     }
 
     return (

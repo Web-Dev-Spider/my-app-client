@@ -72,10 +72,14 @@ const ProductManagement = () => {
 
         let matchesCategory = true;
         if (filterCategory) {
-            if (filterCategory === 'Fiber') {
+            // treat a few keys as valuation filters for cylinders
+            const valuationKeys = ['NFR', 'VALUATED', 'DEPOSIT'];
+            if (valuationKeys.includes(filterCategory) && currentTabType === 'cylinder') {
+                matchesCategory = p.valuationType === filterCategory;
+            } else if (filterCategory === 'Fiber') {
                 matchesCategory = p.isFiber;
             } else if (p.type === 'nfr') {
-                // For NFR, filterCategory could be a subcategory
+                // For NFR products, filterCategory could be a subcategory
                 // Check if it matches subcategory, or fall back to category if broad
                 matchesCategory = (p.subcategory === filterCategory) ||
                     (p.category && p.category.toLowerCase() === filterCategory.toLowerCase());
@@ -95,7 +99,11 @@ const ProductManagement = () => {
         domestic: products.filter(p => p.type === 'cylinder' && catMatch(p, 'Domestic')).length,
         commercial: products.filter(p => p.type === 'cylinder' && catMatch(p, 'Commercial')).length,
         ftl: products.filter(p => p.type === 'cylinder' && catMatch(p, 'FTL')).length,
-        fiber: products.filter(p => p.type === 'cylinder' && p.isFiber).length
+        fiber: products.filter(p => p.type === 'cylinder' && p.isFiber).length,
+        // valuation-type breakdown (backend holds this on cylinder products)
+        nfr: products.filter(p => p.type === 'cylinder' && p.valuationType === 'NFR').length,
+        valuated: products.filter(p => p.type === 'cylinder' && p.valuationType === 'VALUATED').length,
+        deposit: products.filter(p => p.type === 'cylinder' && p.valuationType === 'DEPOSIT').length
     };
 
     const nfrCounts = {
@@ -351,12 +359,15 @@ const ProductManagement = () => {
             <div className="mb-6 space-y-4">
                 <div>
                     <h3 className="text-[10px] font-bold text-theme-secondary opacity-70 uppercase tracking-widest mb-2 pl-1">Cylinders Overview</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+                    <div className="grid grid-cols-2 md:grid-cols-8 gap-2">
                         {renderDashboardCard('All Cylinders', cylinderCounts.total, null, 'cylinder')}
                         {renderDashboardCard('Domestic', cylinderCounts.domestic, 'Domestic', 'cylinder')}
                         {renderDashboardCard('Commercial', cylinderCounts.commercial, 'Commercial', 'cylinder')}
                         {renderDashboardCard('FTL', cylinderCounts.ftl, 'FTL', 'cylinder')}
                         {renderDashboardCard('Fiber', cylinderCounts.fiber, 'Fiber', 'cylinder')}
+                        {renderDashboardCard('NFR Valuation', cylinderCounts.nfr, 'NFR', 'cylinder')}
+                        {renderDashboardCard('Deposits', cylinderCounts.deposit, 'DEPOSIT', 'cylinder')}
+                        {renderDashboardCard('Valuated', cylinderCounts.valuated, 'VALUATED', 'cylinder')}
                     </div>
                 </div>
 
@@ -431,6 +442,7 @@ const ProductManagement = () => {
                                 <th className="px-4 py-3 text-right">Purchase Price</th>
                                 <th className="px-4 py-3 text-right">Sale Price</th>
                                 <th className="px-4 py-3 text-center">Tax %</th>
+                                {activeTab === 'cylinder' && <th className="px-4 py-3 text-center">Valuation</th>}
                                 <th className="px-4 py-3 text-center">Status</th>
                                 <th className="px-4 py-3 text-center">Actions</th>
                             </tr>
@@ -438,11 +450,11 @@ const ProductManagement = () => {
                         <tbody className="divide-y divide-theme-color">
                             {loading ? (
                                 <tr>
-                                    <td colSpan="8" className="px-4 py-8 text-center text-theme-secondary">Loading products...</td>
+                                    <td colSpan={activeTab === 'cylinder' ? 9 : 8} className="px-4 py-8 text-center text-theme-secondary">Loading products...</td>
                                 </tr>
                             ) : filteredProducts.length === 0 ? (
                                 <tr>
-                                    <td colSpan="8" className="px-4 py-8 text-center text-theme-secondary">
+                                    <td colSpan={activeTab === 'cylinder' ? 9 : 8} className="px-4 py-8 text-center text-theme-secondary">
                                         No matching products found.
                                     </td>
                                 </tr>
@@ -510,6 +522,11 @@ const ProductManagement = () => {
                                         <td className="px-4 py-3 text-right font-mono text-green-600">{product.currentPurchasePrice?.toFixed(2)}</td>
                                         <td className="px-4 py-3 text-right font-mono text-blue-600">{product.currentSalePrice?.toFixed(2)}</td>
                                         <td className="px-4 py-3 text-center text-theme-secondary">{product.taxRate}%</td>
+                                        {activeTab === 'cylinder' && (
+                                            <td className="px-4 py-3 text-center text-theme-secondary">
+                                                {product.valuationType || '-'}
+                                            </td>
+                                        )}
                                         <td className="px-4 py-3 text-center">
                                             <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${product.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                                 {product.isActive ? 'Active' : 'Inactive'}
