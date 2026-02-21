@@ -105,6 +105,25 @@ function Navbar() {
                                     >
                                         Empty Dispatch
                                     </NavLink>
+                                    <div className="border-t border-theme-color my-1"></div>
+                                    <NavLink
+                                        to="/deliveries/open"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Active Deliveries
+                                    </NavLink>
+                                    <NavLink
+                                        to="/deliveries/issue"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Issue Stock
+                                    </NavLink>
+                                    <NavLink
+                                        to="/godown/stock"
+                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                    >
+                                        Godown Stock
+                                    </NavLink>
                                 </div>
                             </div>
                         )}
@@ -143,6 +162,13 @@ function Navbar() {
                                             onClick={() => setIsProfileOpen(false)}
                                         >
                                             Settings
+                                        </NavLink>
+                                        <NavLink
+                                            to="/settings/godowns"
+                                            className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                            onClick={() => setIsProfileOpen(false)}
+                                        >
+                                            Godown Settings
                                         </NavLink>
                                         <button
                                             onClick={handleLogout}
@@ -256,6 +282,27 @@ function Navbar() {
                                 >
                                     Empty Dispatch
                                 </NavLink>
+                                <NavLink
+                                    to="/deliveries/open"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Active Deliveries
+                                </NavLink>
+                                <NavLink
+                                    to="/deliveries/issue"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Issue Stock
+                                </NavLink>
+                                <NavLink
+                                    to="/godown/stock"
+                                    className="block pl-4 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary border-l-2 border-theme-color hover:border-theme-accent transition-all"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    Godown Stock
+                                </NavLink>
                             </div>
                         )}
 
@@ -265,6 +312,13 @@ function Navbar() {
                             onClick={() => setIsMenuOpen(false)}
                         >
                             Settings
+                        </NavLink>
+                        <NavLink
+                            to="/settings/godowns"
+                            className="block px-3 py-2 rounded-md text-base font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-tertiary transition-colors"
+                            onClick={() => setIsMenuOpen(false)}
+                        >
+                            Godown Settings
                         </NavLink>
                     </div>
 

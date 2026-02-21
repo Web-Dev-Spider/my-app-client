@@ -61,6 +61,10 @@ import VehicleManagement from './pages/inventory/VehicleManagement'
 import GlobalProductMaster from './pages/admin/GlobalProductMaster'
 import PendingRegistrations from './pages/super-admin/PendingRegistrations'
 import PendingStaff from './pages/admin/PendingStaff'
+import OpenDeliveriesPage from './pages/deliveries/OpenDeliveriesPage'
+import IssueStockPage from './pages/deliveries/IssueStockPage'
+import VehicleStockPage from './pages/vehicles/VehicleStockPage'
+
 import './app.css'
 function App() {
 
@@ -88,7 +92,12 @@ function App() {
               <Route path="/inventory/plant-receipt" element={<PlantPurchase />} />
               <Route path="/inventory/empty-dispatch" element={<EmptyDispatch />} />
               <Route path="/inventory/vehicles" element={<VehicleManagement />} />
+              <Route path="/deliveries/open" element={<OpenDeliveriesPage />} />
+              <Route path="/deliveries/issue" element={<IssueStockPage />} />
+              <Route path="/vehicles/stock/:vehicleId" element={<VehicleStockPage />} />
+
             </Route>
+
             <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'SUPER-ADMIN', 'SHOWROOM-STAFF']} />}>
               <Route path="/kyc" element={<KycPage />} />
             </Route>

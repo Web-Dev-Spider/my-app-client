@@ -67,7 +67,7 @@ const KycPage = () => {
             const url = window.URL.createObjectURL(blob);
             window.open(url, '_blank');
         } catch (err) {
-            // console.log(err);
+            console.log(err);
         }
     }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FaCog, FaPalette, FaUser, FaBell, FaLock, FaChevronRight, FaBuilding, FaBox, FaTruck, FaUsers } from 'react-icons/fa';
+import { FaCog, FaPalette, FaUser, FaBell, FaLock, FaChevronRight, FaBuilding, FaBox, FaTruck, FaUsers, FaMapMarkerAlt } from 'react-icons/fa';
 
 import UserManagementForm from '../components/settings/UserManagementForm';
 import AgencySettings from '../components/settings/AgencySettings';
@@ -10,6 +10,7 @@ import GeneralSettings from '../components/settings/GeneralSettings';
 import ProductManagement from './inventory/ProductManagement';
 import SupplierManagement from './inventory/SupplierManagement';
 import VehicleManagement from './inventory/VehicleManagement';
+import GodownSettingsPage from './settings/GodownSettingsPage';
 
 const Settings = () => {
     const { user } = useAuth();
@@ -21,6 +22,7 @@ const Settings = () => {
         { id: 'account', label: 'Account', icon: FaUser },
         { id: 'notifications', label: 'Notifications', icon: FaBell },
         { id: 'security', label: 'Security', icon: FaLock },
+        ...(user?.role === 'ADMIN' ? [{ id: 'godowns', label: 'Godowns', icon: FaMapMarkerAlt }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'users', label: 'Manage Users', icon: FaUser }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'agency', label: 'Agency', icon: FaBuilding }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'products', label: 'Manage Products', icon: FaBox }] : []),
@@ -56,6 +58,8 @@ const Settings = () => {
                         <AgencySettings />
                     </div>
                 );
+            case 'godowns':
+                return <GodownSettingsPage />;
             case 'products':
                 return <ProductManagement />;
             case 'suppliers':
