@@ -27,8 +27,8 @@ const Profile = () => {
                 </div>
 
                 {/* Details Grid */}
-                <div className="p-8">
-                    <h2 className="text-lg font-semibold text-theme-primary mb-6 border-b border-theme-color pb-2">
+                <div className="p-4">
+                    <h2 className="text-lg font-semibold text-theme-primary mb-2 border-b border-theme-color pb-2">
                         Personal Information
                     </h2>
 

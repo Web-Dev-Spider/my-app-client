@@ -11,8 +11,14 @@ function Navbar() {
 
     const linkClass = ({ isActive }) =>
         `font-medium text-sm tracking-wide transition-colors duration-200 ${isActive
-            ? "text-theme-primary border-b-2 border-theme-accent"
+            ? "text-theme-primary border-b-2 border-theme-accent bg-blue-100"
             : "text-theme-secondary hover:text-theme-primary"
+        }`;
+
+    const dropdownLinkClass = ({ isActive }) =>
+        `block px-4 py-2 text-sm rounded-md transition ${isActive
+            ? "bg-theme-accent text-white"
+            : "text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary"
         }`;
 
     useEffect(() => {
@@ -71,7 +77,7 @@ function Navbar() {
                                         to="/sv-loss"
                                         className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
                                     >
-                                        SV Loss
+                                        Other forms are coming soon...
                                     </NavLink>
                                 </div>
                             </div>
@@ -89,7 +95,7 @@ function Navbar() {
                                 <div className="absolute left-0 mt-2 w-48 bg-theme-secondary rounded-md shadow-lg py-1 border border-theme-color ring-1 ring-black ring-opacity-5 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50 transform origin-top scale-95 group-hover:scale-100">
                                     <NavLink
                                         to="/inventory/dashboard"
-                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
+                                        className={dropdownLinkClass}
                                     >
                                         Live Stock
                                     </NavLink>
@@ -118,12 +124,7 @@ function Navbar() {
                                     >
                                         Issue Stock
                                     </NavLink>
-                                    <NavLink
-                                        to="/godown/stock"
-                                        className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
-                                    >
-                                        Godown Stock
-                                    </NavLink>
+
                                 </div>
                             </div>
                         )}
@@ -163,13 +164,7 @@ function Navbar() {
                                         >
                                             Settings
                                         </NavLink>
-                                        <NavLink
-                                            to="/settings/godowns"
-                                            className="block px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
-                                            onClick={() => setIsProfileOpen(false)}
-                                        >
-                                            Godown Settings
-                                        </NavLink>
+
                                         <button
                                             onClick={handleLogout}
                                             className="block w-full text-left px-4 py-2 text-sm text-theme-secondary hover:bg-theme-tertiary hover:text-theme-primary transition-colors"
@@ -366,3 +361,5 @@ function Navbar() {
 }
 
 export default Navbar;
+
+

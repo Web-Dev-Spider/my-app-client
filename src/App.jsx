@@ -69,6 +69,7 @@ import './app.css'
 function App() {
 
   return (
+
     <ThemeProvider>
       <AuthProvider >
         <Routes>
@@ -124,6 +125,7 @@ function App() {
         </Routes>
       </AuthProvider>
     </ThemeProvider>
+
 
   )
 }

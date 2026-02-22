@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { FaCog, FaPalette, FaUser, FaBell, FaLock, FaChevronRight, FaBuilding, FaBox, FaTruck, FaUsers, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaCog, FaPalette, FaUser, FaBell, FaLock, FaChevronRight, FaBox, FaTruck, FaUsers } from 'react-icons/fa';
 
 import UserManagementForm from '../components/settings/UserManagementForm';
-import AgencySettings from '../components/settings/AgencySettings';
 import AccountSettings from '../components/settings/AccountSettings';
 import AppearanceSettings from '../components/settings/AppearanceSettings';
 import GeneralSettings from '../components/settings/GeneralSettings';
 import ProductManagement from './inventory/ProductManagement';
 import SupplierManagement from './inventory/SupplierManagement';
 import VehicleManagement from './inventory/VehicleManagement';
-import GodownSettingsPage from './settings/GodownSettingsPage';
 
 const Settings = () => {
     const { user } = useAuth();
@@ -22,9 +20,7 @@ const Settings = () => {
         { id: 'account', label: 'Account', icon: FaUser },
         { id: 'notifications', label: 'Notifications', icon: FaBell },
         { id: 'security', label: 'Security', icon: FaLock },
-        ...(user?.role === 'ADMIN' ? [{ id: 'godowns', label: 'Godowns', icon: FaMapMarkerAlt }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'users', label: 'Manage Users', icon: FaUser }] : []),
-        ...(user?.role === 'ADMIN' ? [{ id: 'agency', label: 'Agency', icon: FaBuilding }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'products', label: 'Manage Products', icon: FaBox }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'suppliers', label: 'Manage Suppliers', icon: FaUsers }] : []),
         ...(user?.role === 'ADMIN' ? [{ id: 'vehicles', label: 'Vehicles', icon: FaTruck }] : []),
@@ -48,18 +44,6 @@ const Settings = () => {
                         <UserManagementForm />
                     </div>
                 );
-            case 'agency':
-                return (
-                    <div className="space-y-4 animate-fadeIn">
-                        <div>
-                            <h3 className="text-xl font-bold text-theme-primary mb-1">Agency Details</h3>
-                            <p className="text-sm text-theme-secondary">Manage agency address and contact information.</p>
-                        </div>
-                        <AgencySettings />
-                    </div>
-                );
-            case 'godowns':
-                return <GodownSettingsPage />;
             case 'products':
                 return <ProductManagement />;
             case 'suppliers':
@@ -92,10 +76,10 @@ const Settings = () => {
     return (
         <div className="min-h-screen bg-theme-primary text-theme-primary transition-colors duration-300 pt-6 pb-12 px-4 sm:px-6">
             <div className="max-w-6xl mx-auto">
-                <div className="mb-6">
+                {/* <div className="mb-6">
                     <h1 className="text-2xl font-bold font-serif text-theme-primary">Settings</h1>
                     <p className="text-sm text-theme-secondary mt-1">Manage your account preferences and application settings.</p>
-                </div>
+                </div> */}
 
                 <div className="bg-theme-secondary rounded-2xl shadow-lg border border-theme-color overflow-hidden flex flex-col md:flex-row min-h-[500px]">
                     {/* Sidebar */}
