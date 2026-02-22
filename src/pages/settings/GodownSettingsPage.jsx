@@ -6,7 +6,7 @@ import EditGodownModal from '../../components/godown/EditGodownModal';
 import AddGodownModal from '../../components/godown/AddGodownModal';
 
 const GodownSettingsPage = () => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [godowns, setGodowns] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');

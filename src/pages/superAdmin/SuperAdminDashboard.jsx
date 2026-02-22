@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt, FaBox, FaClock, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+import { FaUserShield, FaUsers, FaChartLine, FaGasPump, FaBuilding, FaSignOutAlt, FaBox, FaClock, FaChevronDown, FaChevronUp, FaTrash } from 'react-icons/fa';
 import { useNavigate } from "react-router-dom";
 import api from '../../axios/axiosInstance';
 import { useTheme } from '../../context/ThemeContext';
@@ -521,6 +521,13 @@ const SuperAdminDashboard = () => {
                                             <span className="text-sm font-medium text-theme-primary">Manage Global Products</span>
                                         </div>
                                         <span className="text-xs text-theme-accent opacity-0 group-hover:opacity-100 transition-opacity">Go &rarr;</span>
+                                    </button>
+                                    <button onClick={() => navigate('/super-admin/delete-agency')} className="w-full p-3 rounded-lg border border-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 text-left flex items-center justify-between group transition-colors">
+                                        <div className="flex items-center gap-2">
+                                            <FaTrash className="text-red-500 group-hover:text-red-700" />
+                                            <span className="text-sm font-medium text-red-700">Delete Agency</span>
+                                        </div>
+                                        <span className="text-xs text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">Go &rarr;</span>
                                     </button>
                                     <button className="w-full p-3 rounded-lg border border-theme-color hover:bg-theme-tertiary text-left flex items-center justify-between group transition-colors">
                                         <span className="text-sm font-medium text-theme-primary">Manage Users</span>

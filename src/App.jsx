@@ -60,6 +60,7 @@ import ProductManagement from './pages/inventory/ProductManagement'
 import VehicleManagement from './pages/inventory/VehicleManagement'
 import GlobalProductMaster from './pages/admin/GlobalProductMaster'
 import PendingRegistrations from './pages/super-admin/PendingRegistrations'
+import DeleteAgency from './pages/super-admin/DeleteAgency'
 import PendingStaff from './pages/admin/PendingStaff'
 import OpenDeliveriesPage from './pages/deliveries/OpenDeliveriesPage'
 import IssueStockPage from './pages/deliveries/IssueStockPage'
@@ -114,6 +115,7 @@ function App() {
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} />
             <Route path="/super-admin/products" element={<GlobalProductMaster />} />
             <Route path="/super-admin/pending-registrations" element={<PendingRegistrations />} />
+            <Route path="/super-admin/delete-agency" element={<DeleteAgency />} />
           </Route>
 
           {/* Admin Routes */}
